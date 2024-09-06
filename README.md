@@ -3,7 +3,7 @@ Team Name: ScoundScape
 
 Team Members:
   1. Austin Schoster (schostaj@mail.uc.edu) - Computer Science
-  2. Joe Schnizer () - Computer Science
+  2. Joe Schnizer (schnizjt@mail.uc.edu) - Computer Science
   3. Derrick Mchale () - Computer Science
 
 # Project Topic/Description
