@@ -1,5 +1,5 @@
 # D0:
-  In this diagram, the user, represented by an oval, uses the app to achieve the goal, represented by a star, of creating a personalized spotify playlist based on their inputs.
+  In this diagram, the user, represented by an oval, uses the app to achieve the goal, represented by a triangle, of creating a personalized spotify playlist based on their inputs.
 
 # D1:
   This diagram is more detailed than the one from D0. This diagram shows the specific inputs, represented by rectangles, that the user will provide for the playlist to be created. These inputs include music specific elements (which can be BPM, dancability, genre, and key), mood factors (such as happy, sad, tired, etc.), and weather factors (such as current location temperature and precipitation).
