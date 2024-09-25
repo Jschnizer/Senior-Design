@@ -13,4 +13,4 @@
 12. Execute testing at the end of development to test all functionality - Derrick Mchale
 13. Develop logic to create personalized playlists - Derrick Mchale
 14. Develop code to centralize data collection for use when developing playlists - Austin Schoster
-15. 
+15. Develop documentation for the application as the process moves forward - Joseph Schnizer
