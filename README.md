@@ -16,3 +16,16 @@ This project is an app that uses AI to come up with a playlist of music that is 
  - Devices you are connected to (car, speaker, etc.)
  - A slider that determines how much new music you want to hear
  - Other factors
+
+
+# Table of Contents
+1. Team Names and Abstract
+2. Project Description
+3. User Stories and Diagrams
+4. Project Tasks and Timeline
+5. ABET Concerns Essay
+6. Project Presentation Slideshow
+7. Self-Asessment Essays
+8. Professional Biographies
+9. Budget
+10. Appendix
