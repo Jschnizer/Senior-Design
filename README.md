@@ -7,7 +7,7 @@ Team Members:
   3. Derrick Mchale (mchaleds@mail.uc.edu) - Computer Science
 
 # Table of Contents
-1. Team Names and Abstract
+1. Team Names and Abstract (assignments/Assignment 2 - Project Description/project-description.md)
 2. Project Description
 3. User Stories and Diagrams
 4. Project Tasks and Timeline
