@@ -16,5 +16,5 @@ Team Members:
 7. Project Presentation Slideshow/Video: [Assignment 8 - Fall Design Slideshow](assignments/Assignment%208%20-%20Fall%20Design%20Slideshow)
 8. Self-Asessment Essays: [Assignment 3 - Self-Assessment Essays](assignments/Assignment%203%20-%20Self-Assessment%20Essays)
 9. Professional Biographies: [Assignment 1 - Professional Biographies](assignments/Assignment%201%20-%20Professional%20Biographies)
-10. Budget: 
+10. Budget: [Budget](Budget.md)
 11. Appendix: 
