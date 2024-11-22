@@ -1,37 +1,33 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import './App.css';
 
 function App() {
   const [token, setToken] = useState('');
-  const [refreshToken, setRefreshToken] = useState('');
   const [userData, setUserData] = useState(null);
 
   useEffect(() => {
-    // Get the hash of the url
     const hash = window.location.search;
     let token = window.localStorage.getItem('token');
-    let refreshToken = window.localStorage.getItem('refresh_token');
 
     if (!token && hash) {
       const urlParams = new URLSearchParams(hash.substring(1));
       token = urlParams.get('access_token');
-      refreshToken = urlParams.get('refresh_token');
-
-      window.location.search = ''; // Clear the URL query parameters
+      window.location.search = '';
       window.localStorage.setItem('token', token);
-      window.localStorage.setItem('refresh_token', refreshToken);
     }
 
     setToken(token);
-    setRefreshToken(refreshToken);
+  }, []);
 
-    if (token) {
-      fetchUserData(token);
+  const fetchUserData = () => {
+    if (!token) {
+      alert('Please log in first!');
+      return;
     }
-  }, [token]);
 
-  const fetchUserData = (accessToken) => {
-    axios.get('http://localhost:5000/me', { params: { access_token: accessToken } })
+    axios
+      .get('http://localhost:5000/me', { params: { access_token: token } })
       .then(response => {
         setUserData(response.data);
       })
@@ -41,50 +37,41 @@ function App() {
       });
   };
 
-  const refreshAccessToken = () => {
-    axios.get('http://localhost:5000/refresh_token', { params: { refresh_token: refreshToken } })
-      .then(response => {
-        const newToken = response.data.access_token;
-        setToken(newToken);
-        window.localStorage.setItem('token', newToken);
-        fetchUserData(newToken);
-      })
-      .catch(error => {
-        console.error('Error refreshing token:', error);
-      });
-  };
-
   const handleLogin = () => {
     window.location = 'http://localhost:5000/login';
   };
 
   const handleLogout = () => {
     setToken('');
-    setRefreshToken('');
     setUserData(null);
     window.localStorage.removeItem('token');
-    window.localStorage.removeItem('refresh_token');
   };
 
   return (
     <div className="App">
-      <h1>AI-Powered Music App</h1>
+      <h1>SoundScape</h1>
       {!token ? (
         <button onClick={handleLogin}>Login to Spotify</button>
       ) : (
-        <button onClick={handleLogout}>Logout</button>
+        <>
+          <button onClick={handleLogout}>Logout</button>
+          <button onClick={fetchUserData}>Get My Playlists</button>
+        </>
       )}
       {userData && (
-        <div>
+        <div className="user-data">
           <h2>Your Top Tracks</h2>
           <ul>
             {userData.items.map((track, index) => (
-              <li key={index}>{track.name} by {track.artists.map(artist => artist.name).join(', ')}</li>
+              <li key={index}>
+                <strong>{track.name}</strong> by{' '}
+                {track.artists.map(artist => artist.name).join(', ')}
+              </li>
             ))}
           </ul>
         </div>
       )}
-      {token && <button onClick={refreshAccessToken}>Refresh Token</button>}
+      <footer>© 2024 SoundScape. All rights reserved.</footer>
     </div>
   );
 }

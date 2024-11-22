@@ -1,38 +1,90 @@
+/* General Reset */
+body {
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+  background-color: #121212; /* Spotify-like dark background */
+  color: #ffffff; /* White text for contrast */
+  font-family: 'Inter', sans-serif;
+}
+
 .App {
   text-align: center;
+  padding: 20px;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+h1 {
+  font-size: 2.5rem;
+  color: #ffffff;
+  margin-bottom: 20px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+/* Buttons */
+button {
+  padding: 10px 20px;
+  margin: 10px;
+  border: none;
+  border-radius: 25px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+button:hover {
+  transform: scale(1.05);
+  background-color: #1e1eff;
 }
 
-.App-link {
-  color: #61dafb;
+button:focus {
+  outline: none;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Login Button */
+button:first-child {
+  background-color: #1DB954; /* Spotify green */
+  color: #ffffff;
+}
+
+button:first-child:hover {
+  background-color: #1ED760; /* Lighter green on hover */
+}
+
+/* Logout Button */
+button:last-child {
+  background-color: #1E90FF; /* Blue accent */
+  color: #ffffff;
+}
+
+button:last-child:hover {
+  background-color: #1C86EE;
+}
+
+/* User Data Section */
+.user-data {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: #282828; /* Darker container for data */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.user-data h2 {
+  color: #1e1eff;
+}
+
+.user-data ul {
+  list-style: none;
+  padding: 0;
+}
+
+.user-data li {
+  margin: 10px 0;
+  font-size: 1rem;
+  color: #ffffff;
+}
+
+/* Footer */
+footer {
+  margin-top: 50px;
+  font-size: 0.8rem;
+  color: #888888;
 }
