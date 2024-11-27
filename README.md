@@ -21,4 +21,4 @@ Team Members:
     - [Code](code/)
     - [Meeting Notes](assignments/Appendix%20Materials/SoundScape%20Project%20Meeting%20Notes.pdf)
     - [References](assignments/Appendix%20Materials/References.md)
-    - Hours Tracking Sheet
+    - [Hours Tracking Sheet](assignments/Appendix%20Materials/SoundScape%20Hours%20Tracking.xlsx)
