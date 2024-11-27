@@ -17,4 +17,8 @@ Team Members:
 8. Self-Asessment Essays: [Assignment 3 - Self-Assessment Essays](assignments/Assignment%203%20-%20Self-Assessment%20Essays)
 9. Professional Biographies: [Assignment 1 - Professional Biographies](assignments/Assignment%201%20-%20Professional%20Biographies)
 10. Budget: [Budget](Budget.md)
-11. Appendix: 
+11. Appendix:
+    - [Code](code/)
+    - [Meeting Notes](assignments/Appendix%20Materials/SoundScape%20Project%20Meeting%20Notes.pdf)
+    - [References](assignments/Appendix%20Materials/References.md)
+    - Hours Tracking Sheet
