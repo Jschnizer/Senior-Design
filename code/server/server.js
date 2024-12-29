@@ -116,6 +116,22 @@ app.get('/refresh_token', (req, res) => {
     });
 });
 
+// Route to fetch weather data
+app.get('/weather', async (req, res) => {
+  try {
+    const { lat, lon } = req.query;
+
+    // Build the OpenWeatherMap URL
+    const openWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${process.env.OPENWEATHER_API_KEY}&units=imperial`;
+
+    const weatherResponse = await axios.get(openWeatherUrl);
+    res.json(weatherResponse.data); // Return weather data to the client
+  } catch (error) {
+    console.error('Error fetching weather:', error);
+    res.status(500).json({ error: 'Unable to fetch weather data' });
+  }
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
