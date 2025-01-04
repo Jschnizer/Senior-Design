@@ -5,41 +5,45 @@ import numpy as np
 
 # Initialize Flask app
 app = Flask(__name__)
-
-# Enable CORS
 CORS(app)
 
-# Load the Keras model
+# Load the trained Keras model
 model = tf.keras.models.load_model('recommendation_model.keras')
 
-# Route to serve recommendations
 @app.route('/recommend', methods=['POST'])
 def recommend():
     try:
-        # Get input data from the POST request
         data = request.json
 
-        # Extract features
-        features = [
-            data['danceability'], 
-            data['energy'], 
-            data['tempo'], 
-            data['mood'], 
-            data['time_of_day']
-        ]
+        # Extract input data
+        top_tracks = data['topTracks']  # List of track IDs
+        mood = data['mood']  # Numeric mood (e.g., happy = 1, sad = 2)
+        percent_new = data['percentNew']  # Discovery percentage
+        weather = data['weather']  # Weather condition
 
-        # Prepare input for the model
-        input_data = np.array([features])  # Ensure it's a 2D array
+        # Example: Average features for top tracks (replace with real Spotify features)
+        avg_danceability = np.mean([0.8, 0.7, 0.9])  # Mock data
+        avg_energy = np.mean([0.6, 0.7, 0.8])  # Mock data
+        avg_tempo = np.mean([120, 130, 140])  # Mock data
 
-        # Get prediction
-        prediction = model.predict(input_data)
-        liked = int(prediction[0][0] > 0.5)  # Binary classification threshold (0.5)
+        # Prepare input for the AI model
+        input_data = np.array([[avg_danceability, avg_energy, avg_tempo, mood, percent_new]])
 
-        # Return response
-        return jsonify({"liked": liked, "confidence": float(prediction[0][0])})
+        # Make predictions
+        prediction = model.predict(input_data)[0][0]
+        liked = int(prediction > 0.5)
+        confidence = float(prediction)
+
+        # Return recommendations
+        recommendations = {
+            "liked": liked,
+            "confidence": confidence,
+            "message": "Tracks tailored to your preferences"
+        }
+
+        return jsonify(recommendations)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# Run the Flask app
 if __name__ == '__main__':
     app.run(port=5001)

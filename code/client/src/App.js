@@ -6,6 +6,9 @@ function App() {
   const [token, setToken] = useState('');
   const [userData, setUserData] = useState(null);
   const [weatherData, setWeatherData] = useState(null);
+  const [recommendations, setRecommendations] = useState([]);
+  const [mood, setMood] = useState(''); // Mood selected by the user
+  const [percentNew, setPercentNew] = useState(0.5); // Discovery slider
 
   useEffect(() => {
     const hash = window.location.search;
@@ -45,36 +48,43 @@ function App() {
   const handleLogout = () => {
     setToken('');
     setUserData(null);
+    setRecommendations([]);
     window.localStorage.removeItem('token');
   };
 
   const fetchRecommendations = () => {
+    if (!userData || !token) {
+      alert('Please log in and fetch your playlists first!');
+      return;
+    }
+  
+    // Prepare top track IDs
+    const topTracks = userData.items.slice(0, 5).map(track => track.id);
+  
     axios
-      .post('http://localhost:5001/recommend', {
-        danceability: 0.8,
-        energy: 0.7,
-        tempo: 120,
-        mood: 1, // Happy
-        time_of_day: 2 // Afternoon
+      .post('http://localhost:5000/recommend', {
+        topTracks,
+        mood, // e.g., "happy"
+        percentNew, // Discovery percentage
+        weather: weatherData?.weather[0]?.description || 'unknown',
       })
       .then(response => {
-        console.log("Recommendation:", response.data);
-        // Display the result to the user
+        console.log('Recommendations:', response.data);
+        // Display the recommendations to the user
       })
       .catch(error => {
-        console.error("Error fetching recommendations:", error);
+        console.error('Error fetching recommendations:', error);
+        alert('Failed to fetch recommendations. Please try again.');
       });
   };
+  
 
-  // Fetch weather data
   const fetchWeather = () => {
-    // Get user's current position
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const lat = position.coords.latitude;
         const lon = position.coords.longitude;
-        
-        // Call /weather endpoint on the server
+
         axios
           .get('http://localhost:5000/weather', {
             params: { lat, lon },
@@ -107,8 +117,31 @@ function App() {
         </>
       )}
 
-      <button onClick={fetchRecommendations}>Get AI Recommendations</button>
-      <button onClick={fetchWeather}>Get Weather for My Location</button>
+      <div>
+        <h2>Contextual Inputs</h2>
+        <label>
+          Mood:
+          <select value={mood} onChange={(e) => setMood(e.target.value)}>
+            <option value="">Select Mood</option>
+            <option value="happy">Happy</option>
+            <option value="sad">Sad</option>
+            <option value="energetic">Energetic</option>
+          </select>
+        </label>
+        <label>
+          Discovery (% New Songs):
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.1"
+            value={percentNew}
+            onChange={(e) => setPercentNew(Number(e.target.value))}
+          />
+        </label>
+        <button onClick={fetchWeather}>Get Weather</button>
+        <button onClick={fetchRecommendations}>Get AI Recommendations</button>
+      </div>
 
       {userData && (
         <div className="user-data">
@@ -130,6 +163,19 @@ function App() {
           <p>Location: {weatherData.name}</p>
           <p>Temperature: {weatherData.main.temp} °F</p>
           <p>Weather: {weatherData.weather[0].description}</p>
+        </div>
+      )}
+
+      {recommendations.length > 0 && (
+        <div className="recommendations">
+          <h2>Recommended Tracks</h2>
+          <ul>
+            {recommendations.map((track, index) => (
+              <li key={index}>
+                {track.name} by {track.artist}
+              </li>
+            ))}
+          </ul>
         </div>
       )}
 
