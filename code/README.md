@@ -4,3 +4,7 @@
 2. Run *node server.js*
 3. Open another terminal and navigate to code/client
 4. Run *npm start*
+
+## To run the python server to access the AI model:
+1. Navigate to model/server
+2. Run *python server.py*
