@@ -1,0 +1,30 @@
+.swipeable-card {
+  position: absolute;
+  width: 300px;
+  height: 400px;
+  background: #121212;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  text-align: center;
+  cursor: grab;
+  will-change: transform;
+}
+
+.swipeable-card img {
+  width: 100%;
+  height: auto;
+  pointer-events: none; /* Prevent image click propagation */
+  border-radius: 10px;
+}
+
+.swipeable-card h3,
+.swipeable-card p {
+  margin: 0;
+  color: #fff;
+}

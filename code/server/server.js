@@ -111,13 +111,19 @@ app.post('/recommend', async (req, res) => {
     };
     const moodNumeric = moodMapping[mood] || 0; // Default to 0 if mood is invalid
 
+    // Example: Map current hour to time of day (morning = 0, afternoon = 1, evening = 2, night = 3)
+    const currentHour = new Date().getHours();
+    const timeOfDay = currentHour < 12 ? 0 : currentHour < 18 ? 1 : currentHour < 21 ? 2 : 3;
+
     // Send data to Python server
     const response = await axios.post('http://localhost:5001/recommend', {
       topTracks,
       mood: moodNumeric,
       percentNew,
       weather,
+      timeOfDay,
     });
+
     console.log("Response from Python server:", response.data);
     res.json(response.data);
   } catch (error) {
@@ -125,6 +131,7 @@ app.post('/recommend', async (req, res) => {
     res.status(500).json({ error: 'Error fetching recommendations' });
   }
 });
+
 
 // Route to fetch weather data
 app.get('/weather', async (req, res) => {

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import SwipeableCard from './SwipeableCard'; // Import the swipeable card component
 import axios from 'axios';
 import './App.css';
 
@@ -7,8 +8,10 @@ function App() {
   const [userData, setUserData] = useState(null);
   const [weatherData, setWeatherData] = useState(null);
   const [recommendations, setRecommendations] = useState([]);
-  const [mood, setMood] = useState(''); // Mood selected by the user
-  const [percentNew, setPercentNew] = useState(0.5); // Discovery slider
+  const [playlist, setPlaylist] = useState([]);
+  const [mood, setMood] = useState('');
+  const [percentNew, setPercentNew] = useState(0.5);
+  const [maxTracks, setMaxTracks] = useState(10); // Number of tracks to display
 
   useEffect(() => {
     const hash = window.location.search;
@@ -32,10 +35,22 @@ function App() {
 
     axios
       .get('http://localhost:5000/me', { params: { access_token: token } })
-      .then(response => {
+      .then((response) => {
         setUserData(response.data);
+
+        // Extract a configurable number of tracks and set them as recommendations
+        const tracksToDisplay = response.data.items
+          .slice(0, maxTracks)
+          .map((track) => ({
+            id: track.id,
+            name: track.name,
+            artist: track.artists.map((artist) => artist.name).join(', '),
+            albumCover: track.album.images[0]?.url || 'https://via.placeholder.com/150',
+          }));
+
+        setRecommendations(tracksToDisplay);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error fetching user data:', error);
         alert('Failed to fetch user data. Please log in again.');
       });
@@ -49,6 +64,7 @@ function App() {
     setToken('');
     setUserData(null);
     setRecommendations([]);
+    setPlaylist([]);
     window.localStorage.removeItem('token');
   };
 
@@ -57,27 +73,26 @@ function App() {
       alert('Please log in and fetch your playlists first!');
       return;
     }
-  
-    // Prepare top track IDs
-    const topTracks = userData.items.slice(0, 5).map(track => track.id);
-  
+
+    const topTracks = userData.items.slice(0, maxTracks).map((track) => track.id);
+
     axios
       .post('http://localhost:5000/recommend', {
         topTracks,
-        mood, // e.g., "happy"
-        percentNew, // Discovery percentage
+        mood,
+        percentNew,
         weather: weatherData?.weather[0]?.description || 'unknown',
       })
-      .then(response => {
-        console.log('Recommendations:', response.data);
-        // Display the recommendations to the user
+      .then((response) => {
+        // TODO: Update recommendations based on response
+        //setRecommendations(response.data.recommendations);
+        console.log('Recommendations:', response.data.recommendations);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error fetching recommendations:', error);
         alert('Failed to fetch recommendations. Please try again.');
       });
   };
-  
 
   const fetchWeather = () => {
     navigator.geolocation.getCurrentPosition(
@@ -89,11 +104,10 @@ function App() {
           .get('http://localhost:5000/weather', {
             params: { lat, lon },
           })
-          .then(response => {
-            console.log('Weather data:', response.data);
+          .then((response) => {
             setWeatherData(response.data);
           })
-          .catch(error => {
+          .catch((error) => {
             console.error('Error fetching weather:', error);
             alert('Failed to fetch weather. Please try again.');
           });
@@ -105,16 +119,25 @@ function App() {
     );
   };
 
+  const handleSwipe = (direction, track) => {
+    if (direction === 'right') {
+      // Add track to playlist
+      setPlaylist((prev) => [...prev, track]);
+    }
+    // Remove the swiped track from recommendations
+    setRecommendations((prev) => prev.filter((rec) => rec.id !== track.id));
+  };
+
   return (
     <div className="App">
       <h1>SoundScape</h1>
       {!token ? (
         <button onClick={handleLogin}>Login to Spotify</button>
       ) : (
-        <>
+        <div>
           <button onClick={handleLogout}>Logout</button>
-          <button onClick={fetchUserData}>Get My Playlists</button>
-        </>
+          <button onClick={fetchUserData}>Get My Tracks</button>
+        </div>
       )}
 
       <div>
@@ -126,6 +149,7 @@ function App() {
             <option value="happy">Happy</option>
             <option value="sad">Sad</option>
             <option value="energetic">Energetic</option>
+            <option value="relaxed">Relaxed</option>
           </select>
         </label>
         <label>
@@ -139,38 +163,44 @@ function App() {
             onChange={(e) => setPercentNew(Number(e.target.value))}
           />
         </label>
+        <label>
+          Max Tracks to Display:
+          <input
+            type="number"
+            min="1"
+            max="50"
+            value={maxTracks}
+            onChange={(e) => setMaxTracks(Number(e.target.value))}
+          />
+        </label>
         <button onClick={fetchWeather}>Get Weather</button>
         <button onClick={fetchRecommendations}>Get AI Recommendations</button>
       </div>
-
-      {userData && (
-        <div className="user-data">
-          <h2>Your Top Tracks</h2>
-          <ul>
-            {userData.items.map((track, index) => (
-              <li key={index}>
-                <strong>{track.name}</strong> by{' '}
-                {track.artists.map(artist => artist.name).join(', ')}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
 
       {weatherData && (
         <div className="weather-data">
           <h2>Current Weather</h2>
           <p>Location: {weatherData.name}</p>
           <p>Temperature: {weatherData.main.temp} °F</p>
-          <p>Weather: {weatherData.weather[0].description}</p>
+          <p>Weather: {weatherData.weather[0]?.description}</p>
         </div>
       )}
 
-      {recommendations.length > 0 && (
-        <div className="recommendations">
-          <h2>Recommended Tracks</h2>
+      <div className="swipe-container">
+        {recommendations.length > 0 ? (
+          recommendations.map((track) => (
+            <SwipeableCard key={track.id} track={track} onSwipe={handleSwipe} />
+          ))
+        ) : (
+          <p>No recommendations available. Fetch your tracks to get started!</p>
+        )}
+      </div>
+
+      {playlist.length > 0 && (
+        <div className="playlist">
+          <h2>My Playlist</h2>
           <ul>
-            {recommendations.map((track, index) => (
+            {playlist.map((track, index) => (
               <li key={index}>
                 {track.name} by {track.artist}
               </li>
