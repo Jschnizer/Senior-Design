@@ -1,15 +1,17 @@
 /* General Reset */
 body {
   margin: 0;
+  padding: 0;
   font-family: 'Arial', sans-serif;
-  background-color: #121212; /* Spotify-like dark background */
-  color: #ffffff; /* White text for contrast */
+  background-color: #121212;
+  /* Spotify-like dark background */
+  color: #ffffff;
+  /* White text for contrast */
   font-family: 'Inter', sans-serif;
 }
 
 .App {
   text-align: center;
-  padding: 20px;
 }
 
 h1 {
@@ -40,17 +42,20 @@ button:focus {
 
 /* Login Button */
 button:first-child {
-  background-color: #1DB954; /* Spotify green */
+  background-color: #1DB954;
+  /* Spotify green */
   color: #ffffff;
 }
 
 button:first-child:hover {
-  background-color: #1ED760; /* Lighter green on hover */
+  background-color: #1ED760;
+  /* Lighter green on hover */
 }
 
 /* Logout Button */
 button:last-child {
-  background-color: #1E90FF; /* Blue accent */
+  background-color: #1E90FF;
+  /* Blue accent */
   color: #ffffff;
 }
 
@@ -63,7 +68,8 @@ button:last-child:hover {
   margin-top: 20px;
   padding: 20px;
   border-radius: 10px;
-  background-color: #282828; /* Darker container for data */
+  background-color: #282828;
+  /* Darker container for data */
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
 
@@ -95,6 +101,7 @@ footer {
   align-items: center;
   height: 400px;
   position: relative;
+  margin-top: 50px;
 }
 
 .swipe-card {
@@ -135,3 +142,87 @@ footer {
   margin: 5px 0;
 }
 
+.menu-bar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background-color: #1db954;
+  color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50px;
+  z-index: 1000;
+}
+
+.menu-bar h1 {
+  margin-right: auto;
+  font-size: 1.5rem;
+  color: white;
+}
+
+
+.content {
+  padding-top: 60px;
+}
+
+.hamburger-icon {
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.flyout-menu {
+  position: fixed;
+  top: 0;
+  right: -300px;
+  width: 300px;
+  height: 100%;
+  background-color: #282828;
+  color: white;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  transition: right 0.3s ease-in-out;
+  z-index: 999;
+}
+
+.flyout-menu.open {
+  right: 0;
+}
+
+.close-btn {
+  align-self: flex-end;
+  font-size: 24px;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.flyout-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+
+.flyout-menu li {
+  margin: 10px 0;
+  cursor: pointer;
+}
+
+.inputs-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.inputs-grid label {
+  display: flex;
+  flex-direction: column;
+}

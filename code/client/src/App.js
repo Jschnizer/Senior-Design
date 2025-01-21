@@ -12,6 +12,13 @@ function App() {
   const [mood, setMood] = useState('');
   const [percentNew, setPercentNew] = useState(0.5);
   const [maxTracks, setMaxTracks] = useState(10); // Number of tracks to display
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [genres, setGenres] = useState([]);
+  const [tempo, setTempo] = useState(50);
+  const [useWeather, setUseWeather] = useState(false);
+  const [minDuration, setMinDuration] = useState(1);
+  const [maxDuration, setMaxDuration] = useState(30);
+  const [selectedArtists, setSelectedArtists] = useState([]);
 
   useEffect(() => {
     const hash = window.location.search;
@@ -128,87 +135,200 @@ function App() {
     setRecommendations((prev) => prev.filter((rec) => rec.id !== track.id));
   };
 
+  useEffect(() => {
+    const hash = window.location.search;
+    let savedToken = window.localStorage.getItem('token');
+
+    if (!savedToken && hash) {
+      const urlParams = new URLSearchParams(hash.substring(1));
+      savedToken = urlParams.get('access_token');
+      window.location.search = '';
+      window.localStorage.setItem('token', savedToken);
+    }
+
+    setToken(savedToken);
+  }, []);
+
+  const toggleMenu = () => {
+    setIsMenuOpen((prev) => !prev);
+  };
+
   return (
     <div className="App">
-      <h1>SoundScape</h1>
-      {!token ? (
-        <button onClick={handleLogin}>Login to Spotify</button>
-      ) : (
-        <div>
-          <button onClick={handleLogout}>Logout</button>
-          <button onClick={fetchUserData}>Get My Tracks</button>
-        </div>
-      )}
 
-      <div>
-        <h2>Contextual Inputs</h2>
-        <label>
-          Mood:
-          <select value={mood} onChange={(e) => setMood(e.target.value)}>
-            <option value="">Select Mood</option>
-            <option value="happy">Happy</option>
-            <option value="sad">Sad</option>
-            <option value="energetic">Energetic</option>
-            <option value="relaxed">Relaxed</option>
-          </select>
-        </label>
-        <label>
-          Discovery (% New Songs):
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.1"
-            value={percentNew}
-            onChange={(e) => setPercentNew(Number(e.target.value))}
-          />
-        </label>
-        <label>
-          Max Tracks to Display:
-          <input
-            type="number"
-            min="1"
-            max="50"
-            value={maxTracks}
-            onChange={(e) => setMaxTracks(Number(e.target.value))}
-          />
-        </label>
+      <div className="menu-bar">
+        <h1>SoundScape</h1>
+        {!token ? (
+          <button onClick={handleLogin}>Login to Spotify</button>
+        ) : (
+          <div>
+            <button onClick={handleLogout}>Logout</button>
+            <button onClick={fetchUserData}>Get My Tracks</button>
+          </div>
+        )}
+
         <button onClick={fetchWeather}>Get Weather</button>
         <button onClick={fetchRecommendations}>Get AI Recommendations</button>
+        <button className="hamburger-icon" onClick={toggleMenu}>
+          ☰
+        </button>
       </div>
 
-      {weatherData && (
-        <div className="weather-data">
-          <h2>Current Weather</h2>
-          <p>Location: {weatherData.name}</p>
-          <p>Temperature: {weatherData.main.temp} °F</p>
-          <p>Weather: {weatherData.weather[0]?.description}</p>
-        </div>
-      )}
+      <div className="content">
+        <h2>Contextual Inputs</h2>
+        <div className="inputs-grid">
+          {/* Mood */}
+          <label>
+            Mood:
+            <select value={mood} onChange={(e) => setMood(e.target.value)}>
+              <option value="">Select Mood</option>
+              <option value="happy">Happy</option>
+              <option value="sad">Sad</option>
+              <option value="energetic">Energetic</option>
+              <option value="relaxed">Relaxed</option>
+            </select>
+          </label>
 
-      <div className="swipe-container">
-        {recommendations.length > 0 ? (
-          recommendations.map((track) => (
-            <SwipeableCard key={track.id} track={track} onSwipe={handleSwipe} />
-          ))
-        ) : (
-          <p>No recommendations available. Fetch your tracks to get started!</p>
+          {/* Discovery */}
+          <label>
+            Discovery (% New Songs):
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.1"
+              value={percentNew}
+              onChange={(e) => setPercentNew(Number(e.target.value))}
+            />
+          </label>
+
+          {/* Max Tracks */}
+          <label>
+            Max Tracks to Display:
+            <input
+              type="number"
+              min="1"
+              max="50"
+              value={maxTracks}
+              onChange={(e) => setMaxTracks(Number(e.target.value))}
+            />
+          </label>
+
+          {/* Genres */}
+          <label>
+            Genres:
+            <select
+              multiple
+              value={genres}
+              onChange={(e) =>
+                setGenres(Array.from(e.target.selectedOptions, (option) => option.value))
+              }
+            >
+              <option value="pop">Pop</option>
+              <option value="rock">Rock</option>
+              <option value="jazz">Jazz</option>
+              <option value="classical">Classical</option>
+              <option value="hiphop">Hip Hop</option>
+            </select>
+          </label>
+
+          {/* Tempo */}
+          <label>
+            Tempo (BPM):
+            <input
+              type="range"
+              min="1"
+              max="100"
+              value={tempo}
+              onChange={(e) => setTempo(Number(e.target.value))}
+            />
+          </label>
+
+          {/* Use Weather */}
+          <label>
+            <input
+              type="checkbox"
+              checked={useWeather}
+              onChange={(e) => setUseWeather(e.target.checked)}
+            />
+            Use Weather Conditions
+          </label>
+
+          {/* Minimum Duration */}
+          <label>
+            Minimum Song Duration (Minutes):
+            <input
+              type="number"
+              min="1"
+              max="10"
+              value={minDuration}
+              onChange={(e) => setMinDuration(Number(e.target.value))}
+            />
+          </label>
+
+          {/* Maximum Duration */}
+          <label>
+            Maximum Song Duration (Minutes):
+            <input
+              type="number"
+              min="10"
+              max="30"
+              value={maxDuration}
+              onChange={(e) => setMaxDuration(Number(e.target.value))}
+            />
+          </label>
+
+          {/* Filter by Artist */}
+          <label>
+            Filter by Artist:
+            <select
+              multiple
+              value={selectedArtists}
+              onChange={(e) =>
+                setSelectedArtists(Array.from(e.target.selectedOptions, (option) => option.value))
+              }
+            >
+              <option value="artist1">Artist 1</option>
+              <option value="artist2">Artist 2</option>
+              <option value="artist3">Artist 3</option>
+            </select>
+          </label>
+        </div>
+
+
+
+        {weatherData && (
+          <div className="weather-data">
+            <h2>Current Weather</h2>
+            <p>Location: {weatherData.name}</p>
+            <p>Temperature: {weatherData.main.temp} °F</p>
+            <p>Weather: {weatherData.weather[0]?.description}</p>
+          </div>
+        )}
+
+        <div className="swipe-container">
+          {recommendations.length > 0 ? (
+            recommendations.map((track) => (
+              <SwipeableCard key={track.id} track={track} onSwipe={handleSwipe} />
+            ))
+          ) : (
+            <p>No recommendations available. Fetch your tracks to get started!</p>
+          )}
+        </div>
+
+        {playlist.length > 0 && (
+          <div className="playlist">
+            <h2>My Playlist</h2>
+            <ul>
+              {playlist.map((track, index) => (
+                <li key={index}>
+                  {track.name} by {track.artist}
+                </li>
+              ))}
+            </ul>
+          </div>
         )}
       </div>
-
-      {playlist.length > 0 && (
-        <div className="playlist">
-          <h2>My Playlist</h2>
-          <ul>
-            {playlist.map((track, index) => (
-              <li key={index}>
-                {track.name} by {track.artist}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
       <footer>© 2024 SoundScape. All rights reserved.</footer>
     </div>
   );
