@@ -1,25 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import SwipeableCard from './SwipeableCard'; // Import the swipeable card component
+// App.js
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import axios from 'axios';
+import Header from './components/Header';
+import Home from './pages/Home';
+import Playlist from './pages/Playlist';
 import './App.css';
 
 function App() {
+  // Shared state
+  const [playlist, setPlaylist] = useState([]);
   const [token, setToken] = useState('');
   const [userData, setUserData] = useState(null);
   const [weatherData, setWeatherData] = useState(null);
   const [recommendations, setRecommendations] = useState([]);
-  const [playlist, setPlaylist] = useState([]);
-  const [mood, setMood] = useState('');
-  const [percentNew, setPercentNew] = useState(0.5);
-  const [maxTracks, setMaxTracks] = useState(10); // Number of tracks to display
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [genres, setGenres] = useState([]);
-  const [tempo, setTempo] = useState(50);
-  const [useWeather, setUseWeather] = useState(false);
-  const [minDuration, setMinDuration] = useState(1);
-  const [maxDuration, setMaxDuration] = useState(30);
-  const [selectedArtists, setSelectedArtists] = useState([]);
+  const [flyoutOpen, setFlyoutOpen] = useState(false);
 
+  // Retrieve token from URL or localStorage on mount
   useEffect(() => {
     const hash = window.location.search;
     let savedToken = window.localStorage.getItem('token');
@@ -30,38 +27,10 @@ function App() {
       window.location.search = '';
       window.localStorage.setItem('token', savedToken);
     }
-
     setToken(savedToken);
   }, []);
 
-  const fetchUserData = () => {
-    if (!token) {
-      alert('Please log in first!');
-      return;
-    }
-
-    axios
-      .get('http://localhost:5000/me', { params: { access_token: token } })
-      .then((response) => {
-        setUserData(response.data);
-
-        // Extract a configurable number of tracks and set them as recommendations
-        const tracksToDisplay = response.data.items
-          .slice(0, maxTracks)
-          .map((track) => ({
-            id: track.id,
-            name: track.name,
-            artist: track.artists.map((artist) => artist.name).join(', '),
-            albumCover: track.album.images[0]?.url || 'https://via.placeholder.com/150',
-          }));
-
-        setRecommendations(tracksToDisplay);
-      })
-      .catch((error) => {
-        console.error('Error fetching user data:', error);
-        alert('Failed to fetch user data. Please log in again.');
-      });
-  };
+  // --- Functions for Header and Global Actions ---
 
   const handleLogin = () => {
     window.location = 'http://localhost:5000/login';
@@ -75,262 +44,139 @@ function App() {
     window.localStorage.removeItem('token');
   };
 
-  const fetchRecommendations = () => {
-    if (!userData || !token) {
-      alert('Please log in and fetch your playlists first!');
+  const fetchUserData = () => {
+    if (!token) {
+      alert('Please log in first!');
       return;
     }
-
-    const topTracks = userData.items.slice(0, maxTracks).map((track) => track.id);
-
     axios
-      .post('http://localhost:5000/recommend', {
-        topTracks,
-        mood,
-        percentNew,
-        weather: weatherData?.weather[0]?.description || 'unknown',
-      })
+      .get('http://localhost:5000/me', { params: { access_token: token } })
       .then((response) => {
-        // TODO: Update recommendations based on response
-        //setRecommendations(response.data.recommendations);
-        console.log('Recommendations:', response.data.recommendations);
+        setUserData(response.data);
       })
       .catch((error) => {
-        console.error('Error fetching recommendations:', error);
-        alert('Failed to fetch recommendations. Please try again.');
+        console.error('Error fetching user data:', error);
+        alert('Failed to fetch user data.');
       });
   };
 
   const fetchWeather = () => {
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported by your browser.');
+      return;
+    }
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        const lat = position.coords.latitude;
-        const lon = position.coords.longitude;
-
+        const { latitude, longitude } = position.coords;
         axios
           .get('http://localhost:5000/weather', {
-            params: { lat, lon },
+            params: { lat: latitude, lon: longitude },
           })
           .then((response) => {
             setWeatherData(response.data);
           })
           .catch((error) => {
             console.error('Error fetching weather:', error);
-            alert('Failed to fetch weather. Please try again.');
+            alert('Failed to fetch weather.');
           });
       },
       (error) => {
         console.error('Error getting location:', error);
-        alert('Unable to access your location. Please allow location access.');
+        alert('Unable to retrieve your location.');
       }
     );
   };
 
-  const handleSwipe = (direction, track) => {
-    if (direction === 'right') {
-      // Add track to playlist
-      setPlaylist((prev) => [...prev, track]);
+  // Updated fetchRecommendations to fetch the user's top songs from /me
+  // NOTE: This is a temporary workaround until the recommendation endpoint is implemented
+  const fetchRecommendations = () => {
+    if (!token) {
+      alert('Please log in first!');
+      return;
     }
-    // Remove the swiped track from recommendations
-    setRecommendations((prev) => prev.filter((rec) => rec.id !== track.id));
+    axios
+      .get('http://localhost:5000/me', { params: { access_token: token } })
+      .then((response) => {
+        // Extract a configurable number of tracks from the user's data
+        const tracksToDisplay = response.data.items
+          .slice(0, 10) // Currently gives 10 tracks but can be adjusted
+          .map((track) => ({
+            id: track.id,
+            name: track.name,
+            artist: track.artists.map((artist) => artist.name).join(', '),
+            albumCover: track.album.images[0]?.url || 'https://via.placeholder.com/150',
+          }));
+        setRecommendations(tracksToDisplay);
+      })
+      .catch((error) => {
+        console.error('Error fetching top songs:', error);
+        alert('Failed to fetch top songs.');
+      });
   };
 
-  useEffect(() => {
-    const hash = window.location.search;
-    let savedToken = window.localStorage.getItem('token');
-
-    if (!savedToken && hash) {
-      const urlParams = new URLSearchParams(hash.substring(1));
-      savedToken = urlParams.get('access_token');
-      window.location.search = '';
-      window.localStorage.setItem('token', savedToken);
-    }
-
-    setToken(savedToken);
-  }, []);
-
   const toggleMenu = () => {
-    setIsMenuOpen((prev) => !prev);
+    setFlyoutOpen((prev) => !prev);
   };
 
   return (
-    <div className="App">
+    <Router>
+      <div className="App">
+        {/* Unified Header Component */}
+        <Header
+          token={token}
+          handleLogin={handleLogin}
+          handleLogout={handleLogout}
+          fetchUserData={fetchUserData}
+          fetchWeather={fetchWeather}
+          fetchRecommendations={fetchRecommendations}
+          toggleMenu={toggleMenu}
+        />
 
-      <div className="menu-bar">
-        <h1>SoundScape</h1>
-        {!token ? (
-          <button onClick={handleLogin}>Login to Spotify</button>
-        ) : (
-          <div>
-            <button onClick={handleLogout}>Logout</button>
-            <button onClick={fetchUserData}>Get My Tracks</button>
-          </div>
-        )}
-
-        <button onClick={fetchWeather}>Get Weather</button>
-        <button onClick={fetchRecommendations}>Get AI Recommendations</button>
-        <button className="hamburger-icon" onClick={toggleMenu}>
-          ☰
-        </button>
-      </div>
-
-      <div className="content">
-        <h2>Contextual Inputs</h2>
-        <div className="inputs-grid">
-          {/* Mood */}
-          <label>
-            Mood:
-            <select value={mood} onChange={(e) => setMood(e.target.value)}>
-              <option value="">Select Mood</option>
-              <option value="happy">Happy</option>
-              <option value="sad">Sad</option>
-              <option value="energetic">Energetic</option>
-              <option value="relaxed">Relaxed</option>
-            </select>
-          </label>
-
-          {/* Discovery */}
-          <label>
-            Discovery (% New Songs):
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.1"
-              value={percentNew}
-              onChange={(e) => setPercentNew(Number(e.target.value))}
-            />
-          </label>
-
-          {/* Max Tracks */}
-          <label>
-            Max Tracks to Display:
-            <input
-              type="number"
-              min="1"
-              max="50"
-              value={maxTracks}
-              onChange={(e) => setMaxTracks(Number(e.target.value))}
-            />
-          </label>
-
-          {/* Genres */}
-          <label>
-            Genres:
-            <select
-              multiple
-              value={genres}
-              onChange={(e) =>
-                setGenres(Array.from(e.target.selectedOptions, (option) => option.value))
-              }
-            >
-              <option value="pop">Pop</option>
-              <option value="rock">Rock</option>
-              <option value="jazz">Jazz</option>
-              <option value="classical">Classical</option>
-              <option value="hiphop">Hip Hop</option>
-            </select>
-          </label>
-
-          {/* Tempo */}
-          <label>
-            Tempo (BPM):
-            <input
-              type="range"
-              min="1"
-              max="100"
-              value={tempo}
-              onChange={(e) => setTempo(Number(e.target.value))}
-            />
-          </label>
-
-          {/* Use Weather */}
-          <label>
-            <input
-              type="checkbox"
-              checked={useWeather}
-              onChange={(e) => setUseWeather(e.target.checked)}
-            />
-            Use Weather Conditions
-          </label>
-
-          {/* Minimum Duration */}
-          <label>
-            Minimum Song Duration (Minutes):
-            <input
-              type="number"
-              min="1"
-              max="10"
-              value={minDuration}
-              onChange={(e) => setMinDuration(Number(e.target.value))}
-            />
-          </label>
-
-          {/* Maximum Duration */}
-          <label>
-            Maximum Song Duration (Minutes):
-            <input
-              type="number"
-              min="10"
-              max="30"
-              value={maxDuration}
-              onChange={(e) => setMaxDuration(Number(e.target.value))}
-            />
-          </label>
-
-          {/* Filter by Artist */}
-          <label>
-            Filter by Artist:
-            <select
-              multiple
-              value={selectedArtists}
-              onChange={(e) =>
-                setSelectedArtists(Array.from(e.target.selectedOptions, (option) => option.value))
-              }
-            >
-              <option value="artist1">Artist 1</option>
-              <option value="artist2">Artist 2</option>
-              <option value="artist3">Artist 3</option>
-            </select>
-          </label>
+        {/* Flyout Menu for Mobile (if needed) */}
+        <div className={`flyout-menu ${flyoutOpen ? 'open' : ''}`}>
+          <button className="close-btn" onClick={toggleMenu}>
+            ×
+          </button>
+          <ul>
+            <li onClick={handleLogin}>Login</li>
+            <li onClick={handleLogout}>Logout</li>
+            <li onClick={fetchUserData}>My Tracks</li>
+            <li onClick={fetchWeather}>Get Weather</li>
+            <li onClick={fetchRecommendations}>Get Top Songs</li>
+          </ul>
         </div>
 
+        {/* Routes */}
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <Home
+                token={token}
+                playlist={playlist}
+                setPlaylist={setPlaylist}
+                recommendations={recommendations}
+                fetchRecommendations={fetchRecommendations}
+                weatherData={weatherData}
+              />
+            }
+          />
+          <Route
+            path="/playlist"
+            element={
+              <Playlist
+                recommendations={recommendations}
+                setRecommendations={setRecommendations}
+                playlist={playlist}
+                setPlaylist={setPlaylist}
+              />
+            }
+          />
+        </Routes>
 
-
-        {weatherData && (
-          <div className="weather-data">
-            <h2>Current Weather</h2>
-            <p>Location: {weatherData.name}</p>
-            <p>Temperature: {weatherData.main.temp} °F</p>
-            <p>Weather: {weatherData.weather[0]?.description}</p>
-          </div>
-        )}
-
-        <div className="swipe-container">
-          {recommendations.length > 0 ? (
-            recommendations.map((track) => (
-              <SwipeableCard key={track.id} track={track} onSwipe={handleSwipe} />
-            ))
-          ) : (
-            <p>No recommendations available. Fetch your tracks to get started!</p>
-          )}
-        </div>
-
-        {playlist.length > 0 && (
-          <div className="playlist">
-            <h2>My Playlist</h2>
-            <ul>
-              {playlist.map((track, index) => (
-                <li key={index}>
-                  {track.name} by {track.artist}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+        <footer>© 2024 SoundScape. All rights reserved.</footer>
       </div>
-      <footer>© 2024 SoundScape. All rights reserved.</footer>
-    </div>
+    </Router>
   );
 }
 
