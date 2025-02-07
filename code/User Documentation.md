@@ -1,9 +1,11 @@
-*Note that this application is currently in development, and the steps to run the application and use the application may change frequently as the app is in development.
+**Note that this application is currently in development, and the steps to run the application and use the application may change frequently as the app is in development. These docs will continue to be updated as the application is developed*
 
 # Steps before launch
-1. Install react and all dependencies
-2. Obtain the .env file and add this to the code path
-3. Have a spotify associated email address added to the spotify developer console by an admin
+1. Install all dependencies
+    1. First, install [Node.js](https://nodejs.org/en/download) if necessary
+    2. Then run *npm install express*, *npm install react*, and *npm i*
+3. Obtain the .env file from one of the developers and add this inside the [server](/code/server) folder
+4. Have a Spotify associated email address added to the Spotify developer console by an admin
 
 # Steps to run the code
 *Note: This assumes you have all required packages and dependencies installed. You will need to download node.js, install express, and run npm i in both the code and code/client folders to run the code*
