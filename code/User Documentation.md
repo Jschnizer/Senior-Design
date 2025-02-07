@@ -16,10 +16,11 @@
 1. Navigate to model/server
 2. Run *python server.py*
 
-# Application Running 
-1. Log into the application with the credentials associated with the email that was entered in the spotify developer console
-2. Upon logging in, select various contextual inputs for song filtering *Note this functionality is currently not working and in development.
-3. Select "Get My Tracks" at the top of the page, and a swipable card field will appear populated with song recommendations based on spotify listening data. Swipe this card to begin adding songs to a playlist. *Note this functionality is currently not working and in development. Songs may be swiped and are added to a list to simulate playlist building currently.
+# Application Running
+1. When you run *npm start*, it will launch the application. Otherwise, by default, it will run on port 3000 (while it is still in development) so you can navigate to [localhost:3000](http://localhost:3000) to access the app
+2. Log into the application with the credentials associated with the email that was entered in the spotify developer console
+3. Upon logging in, select various contextual inputs for song filtering *Note this functionality is currently not working and in development.
+4. Select "Get My Tracks" at the top of the page, and a swipable card field will appear populated with song recommendations based on spotify listening data. Swipe this card to begin adding songs to a playlist. *Note this functionality is currently not working and in development. Songs may be swiped and are added to a list to simulate playlist building currently.
 
 # SoundScape Home Page
 1. Top Bar Buttons for Navigation and Testing
