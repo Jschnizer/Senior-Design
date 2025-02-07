@@ -9,7 +9,6 @@ function Header({
   fetchUserData,
   fetchWeather,
   fetchRecommendations,
-  toggleMenu,
 }) {
   const location = useLocation();
 
@@ -32,14 +31,9 @@ function Header({
           ) : (
             <>
               <button onClick={handleLogout}>Logout</button>
-              <button onClick={fetchUserData}>Get My Tracks</button>
             </>
           )}
           <button onClick={fetchWeather}>Get Weather</button>
-          <button onClick={fetchRecommendations}>Get Top Songs</button>
-          <button className="hamburger-icon" onClick={toggleMenu}>
-            ☰
-          </button>
         </div>
       )}
     </header>

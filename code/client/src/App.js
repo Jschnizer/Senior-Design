@@ -14,7 +14,6 @@ function App() {
   const [userData, setUserData] = useState(null);
   const [weatherData, setWeatherData] = useState(null);
   const [recommendations, setRecommendations] = useState([]);
-  const [flyoutOpen, setFlyoutOpen] = useState(false);
 
   // Retrieve token from URL or localStorage on mount
   useEffect(() => {
@@ -114,10 +113,6 @@ function App() {
       });
   };
 
-  const toggleMenu = () => {
-    setFlyoutOpen((prev) => !prev);
-  };
-
   return (
     <Router>
       <div className="App">
@@ -129,22 +124,7 @@ function App() {
           fetchUserData={fetchUserData}
           fetchWeather={fetchWeather}
           fetchRecommendations={fetchRecommendations}
-          toggleMenu={toggleMenu}
         />
-
-        {/* Flyout Menu for Mobile (if needed) */}
-        <div className={`flyout-menu ${flyoutOpen ? 'open' : ''}`}>
-          <button className="close-btn" onClick={toggleMenu}>
-            ×
-          </button>
-          <ul>
-            <li onClick={handleLogin}>Login</li>
-            <li onClick={handleLogout}>Logout</li>
-            <li onClick={fetchUserData}>My Tracks</li>
-            <li onClick={fetchWeather}>Get Weather</li>
-            <li onClick={fetchRecommendations}>Get Top Songs</li>
-          </ul>
-        </div>
 
         {/* Routes */}
         <Routes>
