@@ -1,11 +1,13 @@
-*Note that this application is currently in development, and the steps to run the application and use the application may change frequently as the app is in development.
+**Note that this application is currently in development, and the steps to run the application and use the application may change frequently as the app is in development. These docs will continue to be updated as the application is developed*
 
-# Steps before launch
-1. Install react and all dependencies
-2. Obtain the .env file and add this to the code path
-3. Have a spotify associated email address added to the spotify developer console by an admin
+# Steps Before Launch
+1. Install all dependencies
+    1. First, install [Node.js](https://nodejs.org/en/download) if necessary
+    2. Then run *npm install express*, *npm install react*, and *npm i*
+3. Obtain the .env file from one of the developers and add this inside the [server](/code/server) folder
+4. Have a Spotify associated email address added to the Spotify developer console by an admin
 
-# Steps to run the code
+# Steps to Run the Code
 *Note: This assumes you have all required packages and dependencies installed. You will need to download node.js, install express, and run npm i in both the code and code/client folders to run the code*
 1. Open a terminal and navigate to code/server
 2. Run *node server.js*
@@ -16,10 +18,11 @@
 1. Navigate to model/server
 2. Run *python server.py*
 
-# Application Running 
-1. Log into the application with the credentials associated with the email that was entered in the spotify developer console
-2. Upon logging in, select various contextual inputs for song filtering *Note this functionality is currently not working and in development.
-3. Select "Get My Tracks" at the top of the page, and a swipable card field will appear populated with song recommendations based on spotify listening data. Swipe this card to begin adding songs to a playlist. *Note this functionality is currently not working and in development. Songs may be swiped and are added to a list to simulate playlist building currently.
+# Application Running
+1. When you run *npm start*, it will launch the application. Otherwise, by default, it will run on port 3000 (while it is still in development) so you can navigate to [localhost:3000](http://localhost:3000) to access the app
+2. Log into the application with the credentials associated with the email that was entered in the spotify developer console
+3. Upon logging in, select various contextual inputs for song filtering *Note this functionality is currently not working and in development.
+4. Select "Get My Tracks" at the top of the page, and a swipable card field will appear populated with song recommendations based on spotify listening data. Swipe this card to begin adding songs to a playlist. *Note this functionality is currently not working and in development. Songs may be swiped and are added to a list to simulate playlist building currently.
 
 # SoundScape Home Page
 1. Top Bar Buttons for Navigation and Testing
