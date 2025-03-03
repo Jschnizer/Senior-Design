@@ -14,7 +14,16 @@ function Header({
 
   return (
     <header className="menu-bar">
-      <h1>SoundScape</h1>
+      <img 
+        src="/SoundScape_Word_Logo_Transparent.png"
+        style={{ 
+          width: "300px", 
+          height: "auto",
+          marginRight: "auto"
+        }} 
+        alt="SoundScape Logo" 
+      />
+
       <nav>
         <Link to="/" className="nav-link">
           Home

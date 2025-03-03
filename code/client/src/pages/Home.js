@@ -44,7 +44,7 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
             type="range"
             min="0"
             max="1"
-            step="0.1"
+            step="0.01"
             value={percentNew}
             onChange={(e) => setPercentNew(Number(e.target.value))}
           />
