@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+// Playlist.js
+import React from 'react';
 import SwipeableCard from '../components/SwipeableCard';
+import Loader from '../components/Loader'; // Import your Loader component
 import '../App.css';
 import {
   DndContext,
@@ -19,7 +21,6 @@ import { CSS } from '@dnd-kit/utilities';
 
 function SortableTrack({ track, index, isDiscarded, isInPlaylist, onReshuffle }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: track.id });
-
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -27,16 +28,18 @@ function SortableTrack({ track, index, isDiscarded, isInPlaylist, onReshuffle })
 
   return (
     <div ref={setNodeRef} style={style} className="track-item">
-      <img src={track.albumCover} alt={track.name} className="album-cover" />
+      <img 
+        src={track.albumCover || 'https://via.placeholder.com/150'} 
+        alt={track.name} 
+        className="album-cover" 
+      />
       <div className="track-info">
         <span>{track.name}</span>
         <span className="artist">{track.artist}</span>
       </div>
-
       {(isDiscarded || isInPlaylist) && (
         <button className="reshuffle" onClick={() => onReshuffle(track)}>↩</button>
       )}
-
       {/* Drag Handle */}
       <div className="drag-handle" {...attributes} {...listeners}>
         &#9776;
@@ -45,9 +48,8 @@ function SortableTrack({ track, index, isDiscarded, isInPlaylist, onReshuffle })
   );
 }
 
-function Playlist({ recommendations, setRecommendations }) {
-  const [playlist, setPlaylist] = useState([]);
-  const [discarded, setDiscarded] = useState([]);
+function Playlist({ recommendations, setRecommendations, playlist, setPlaylist, loading }) {
+  const [discarded, setDiscarded] = React.useState([]);
 
   const handleAddToPlaylist = (track) => {
     setPlaylist((prev) => [...prev, track]);
@@ -71,7 +73,6 @@ function Playlist({ recommendations, setRecommendations }) {
 
     const oldIndex = list.findIndex((item) => item.id === active.id);
     const newIndex = list.findIndex((item) => item.id === over.id);
-
     setList((prev) => arrayMove(prev, oldIndex, newIndex));
   };
 
@@ -80,10 +81,18 @@ function Playlist({ recommendations, setRecommendations }) {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
+  // If recommendations are still loading, show the Loader
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <Loader />
+      </div>
+    );
+  }
+
   return (
     <div className="content">
       <div className="playlist-container">
-
         {/* Left Side: Discarded Songs */}
         <DndContext
           sensors={sensors}
@@ -108,16 +117,13 @@ function Playlist({ recommendations, setRecommendations }) {
         <div className="swipe-container">
           <h2>Swipe Songs</h2>
           {recommendations.length > 0 ? (
-
             <div className="swipe-card-wrapper">
               <SwipeableCard track={recommendations[0]} />
-
               <div className="button-group">
                 <button className="red" onClick={() => handleDiscard(recommendations[0])}>−</button>
                 <button className="green" onClick={() => handleAddToPlaylist(recommendations[0])}>+</button>
               </div>
             </div>
-
           ) : (
             <p>No more songs to swipe.</p>
           )}

@@ -1,56 +1,100 @@
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-import tensorflow as tf
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout
-from tensorflow.keras.callbacks import EarlyStopping
-import joblib
+# recommend.py
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import json
 
-# Expanded example data
-data = [
-    {"danceability": 0.8, "energy": 0.7, "tempo": 120, "mood": 1, "time_of_day": 2, "percent_new": 0.7, "liked": 1},
-    {"danceability": 0.6, "energy": 0.5, "tempo": 90, "mood": 0, "time_of_day": 1, "percent_new": 0.3, "liked": 0},
-    {"danceability": 0.9, "energy": 0.8, "tempo": 130, "mood": 1, "time_of_day": 3, "percent_new": 0.9, "liked": 1},
-    {"danceability": 0.4, "energy": 0.2, "tempo": 80, "mood": 0, "time_of_day": 0, "percent_new": 0.2, "liked": 0},
-    {"danceability": 0.7, "energy": 0.6, "tempo": 110, "mood": 1, "time_of_day": 1, "percent_new": 0.8, "liked": 1},
-]
+##########################################
+# Model & Utility Functions
+##########################################
 
-df = pd.DataFrame(data)
+class RecommendationNet(nn.Module):
+    """
+    A simple feed-forward network that fuses user, song, and context embeddings
+    to compute a compatibility score.
+    """
+    def __init__(self, user_dim, song_dim, context_dim, hidden_dim=64):
+        super(RecommendationNet, self).__init__()
+        input_dim = user_dim + song_dim + context_dim
+        self.fc1 = nn.Linear(input_dim, hidden_dim)
+        self.fc2 = nn.Linear(hidden_dim, 1)
 
-# Features and labels
-X = df.drop(columns=["liked"])
-y = df["liked"]
+    def forward(self, user_embedding, song_embedding, context_vector):
+        # Concatenate embeddings along the last dimension.
+        x = torch.cat((user_embedding, song_embedding, context_vector), dim=-1)
+        x = F.relu(self.fc1(x))
+        score = self.fc2(x)
+        return score
 
-# Split into train and test sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+def novelty_function(song_embedding, user_embedding):
+    """
+    Computes a novelty score based on cosine dissimilarity.
+    Higher values indicate more dissimilarity (more novel).
+    """
+    cosine_sim = F.cosine_similarity(song_embedding, user_embedding, dim=-1)
+    novelty_score = 1 - cosine_sim  # Higher novelty means less similar.
+    return novelty_score
 
-# Scale the features
-scaler = StandardScaler()
-X_train_scaled = scaler.fit_transform(X_train)
-X_test_scaled = scaler.transform(X_test)
+def rank_songs(model, user_embedding, song_embeddings, context_vector, novelty_weight=0.5):
+    """
+    Ranks songs based on a computed score that includes a novelty adjustment.
+    """
+    scores = {}
+    # Add batch dimension.
+    user_tensor = user_embedding.unsqueeze(0)      # (1, user_dim)
+    context_tensor = context_vector.unsqueeze(0)     # (1, context_dim)
 
-# Save the scaler for inference
-joblib.dump(scaler, 'scaler.pkl')
+    for song_id, song_embedding in song_embeddings.items():
+        song_tensor = song_embedding.unsqueeze(0)   # (1, song_dim)
+        base_score = model(user_tensor, song_tensor, context_tensor)
+        base_score = base_score.item()
+        novelty_adjust = novelty_weight * novelty_function(song_tensor, user_tensor).item()
+        scores[song_id] = base_score + novelty_adjust
 
-# Build the model
-model = Sequential([
-    Dense(64, activation='relu', input_shape=(X_train.shape[1],)),
-    Dropout(0.2),
-    Dense(32, activation='relu'),
-    Dropout(0.2),
-    Dense(1, activation='sigmoid')
-])
+    # Return song IDs sorted by descending score.
+    ranked_songs = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+    return [song_id for song_id, score in ranked_songs]
 
-model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+##########################################
+# Main: Generate Recommendations
+##########################################
 
-# Train the model with early stopping
-early_stopping = EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True)
-model.fit(X_train_scaled, y_train, epochs=50, validation_data=(X_test_scaled, y_test), callbacks=[early_stopping])
+if __name__ == "__main__":
+    # Define embedding dimensions (replace with your actual dimensions)
+    user_dim = 16
+    song_dim = 32
+    context_dim = 8
 
-# Evaluate
-loss, acc = model.evaluate(X_test_scaled, y_test)
-print("Accuracy:", acc)
+    # Instantiate the model. (In production, load your trained model weights.)
+    model = RecommendationNet(user_dim, song_dim, context_dim)
+    # For example: model.load_state_dict(torch.load('model_weights.pt'))
 
-# Save the model
-model.save("recommendation_model.keras")
+    # Dummy embeddings (replace with real data in production)
+    current_user_embedding = torch.randn(user_dim)
+    current_context_vector = torch.randn(context_dim)
+    song_embeddings = {
+        "song1": torch.randn(song_dim),
+        "song2": torch.randn(song_dim),
+        "song3": torch.randn(song_dim),
+        "song4": torch.randn(song_dim),
+        "song5": torch.randn(song_dim)
+    }
+
+    # Get ranked song IDs based on current user and context.
+    ranked_song_ids = rank_songs(model, current_user_embedding, song_embeddings, current_context_vector, novelty_weight=0.5)
+
+    # Map song IDs to human-readable song titles.
+    dummy_track_name_mapping = {
+        "song1": "Song Title 1",
+        "song2": "Song Title 2",
+        "song3": "Song Title 3",
+        "song4": "Song Title 4",
+        "song5": "Song Title 5"
+    }
+    ranked_track_names = [dummy_track_name_mapping[song_id] for song_id in ranked_song_ids]
+
+    # Output recommendations as JSON.
+    output = {
+        "recommendations": ranked_track_names
+    }
+    print(json.dumps(output))

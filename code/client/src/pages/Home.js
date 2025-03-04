@@ -16,9 +16,9 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
   const [maxDuration, setMaxDuration] = useState(30);
   const [selectedArtists, setSelectedArtists] = useState([]);
 
-  const handleGeneratePlaylist = () => {
+  const handleGeneratePlaylist = (mood, percentNew, genres, tempo, minDuration, maxDuration, useWeather) => {
     // Since the recommendation endpoint is not working yet fetch the user's top songs instead.
-    fetchRecommendations();
+    fetchRecommendations(mood, percentNew, genres, tempo, minDuration, maxDuration, useWeather);
     navigate('/playlist');
   };
 
@@ -147,7 +147,9 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
 
       {/* Generate Playlist button at the bottom */}
       <div style={{ marginTop: '2rem' }}>
-        <button onClick={handleGeneratePlaylist}>Generate Playlist</button>
+        <button onClick={() => handleGeneratePlaylist(mood, percentNew, genres, tempo, minDuration, maxDuration, useWeather)}>
+          Generate Playlist
+        </button>
       </div>
     </div>
   );

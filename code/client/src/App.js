@@ -14,6 +14,7 @@ function App() {
   const [userData, setUserData] = useState(null);
   const [weatherData, setWeatherData] = useState(null);
   const [recommendations, setRecommendations] = useState([]);
+  const [loading, setLoading] = useState(false); // NEW: loading state
 
   // Retrieve token from URL or localStorage on mount
   useEffect(() => {
@@ -28,6 +29,13 @@ function App() {
     }
     setToken(savedToken);
   }, []);
+
+  // Fetch user data when token is set
+  useEffect(() => {
+    if (token) {
+      fetchUserData();
+    }
+  }, [token]);
 
   // --- Functions for Header and Global Actions ---
 
@@ -51,6 +59,7 @@ function App() {
     axios
       .get('http://localhost:5000/me', { params: { access_token: token } })
       .then((response) => {
+        console.log("User Data:", response.data); // For debugging
         setUserData(response.data);
       })
       .catch((error) => {
@@ -86,33 +95,50 @@ function App() {
     );
   };
 
-  // Updated fetchRecommendations to fetch the user's top songs from /me
-  // NOTE: This is a temporary workaround until the recommendation endpoint is implemented
-  const fetchRecommendations = () => {
+  const fetchRecommendations = (mood, percentNew, weather, genres, tempo, minDuration, maxDuration, useWeather) => {
     if (!token) {
       alert('Please log in first!');
       return;
     }
+  
+    setLoading(true); // Start loading
+
+    // Get weather description.
+    const currentWeather = weatherData?.weather[0]?.description || '';
+  
+    // Prepare listening history from userData (if available)
+    const history = userData && userData.items
+      ? userData.items.map(track => `${track.name} by ${track.artists[0].name}`)
+      : [];
+  
+    console.log('History:', history);
+  
+    const payload = {
+      mood,
+      percentNew,
+      weather: useWeather ? currentWeather : '',
+      genres,
+      tempo,
+      minDuration,
+      maxDuration,
+      useWeather,
+      history,
+      access_token: token, // for Spotify search to fetch album covers
+    };
+  
     axios
-      .get('http://localhost:5000/me', { params: { access_token: token } })
+      .post('http://localhost:5000/recommend', payload)
       .then((response) => {
-        // Extract a configurable number of tracks from the user's data
-        const tracksToDisplay = response.data.items
-          .slice(0, 10) // Currently gives 10 tracks but can be adjusted
-          .map((track) => ({
-            id: track.id,
-            name: track.name,
-            artist: track.artists.map((artist) => artist.name).join(', '),
-            albumCover: track.album.images[0]?.url || 'https://via.placeholder.com/150',
-          }));
-        setRecommendations(tracksToDisplay);
+        setRecommendations(response.data.recommendations);
+        setLoading(false); // Stop loading when recommendations arrive
       })
       .catch((error) => {
-        console.error('Error fetching top songs:', error);
-        alert('Failed to fetch top songs.');
+        console.error('Error fetching recommendations:', error);
+        alert('Failed to fetch recommendations.');
+        setLoading(false); // Stop loading on error
       });
   };
-
+  
   return (
     <Router>
       <div className="App">
@@ -149,6 +175,7 @@ function App() {
                 setRecommendations={setRecommendations}
                 playlist={playlist}
                 setPlaylist={setPlaylist}
+                loading={loading}
               />
             }
           />
