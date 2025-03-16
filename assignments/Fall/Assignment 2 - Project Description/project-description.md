@@ -16,7 +16,6 @@ This project is an app that uses AI to come up with a playlist of music that is 
  - Your location
  - The weather
  - The time of day
- - Devices you are connected to (car, speaker, etc.)
  - A slider that determines how much new music you want to hear
  - Other factors 
 
@@ -25,7 +24,7 @@ This app is meant to be a companion app to Spotify. It will come up with a playl
 # Project Abstract/Problem Statement
 Problem Statement: People want to listen to music without skipping songs they don't like. What people want to listen to at a given moment is determined by various contextual factors, and current tools do not exist to take these into account, either inside or outside Spotify. Therefore, our project aims to address the problem.
 
-Our project is an AI-powered music app that generates personalized playlists by integrating with the Spotify API. The app tailors music recommendations to each user’s preferences by analyzing various factors such as listening history, current mood, location, weather, time of day, and connected devices like cars or speakers. What’s unique about this app is how personalized the playlists will be that it creates. It lets users control how much new music they want to discover, blending familiar tracks with fresh selections and accounting for the right mood or timing that may influence what someone wants to hear. This app will aim to create a seamless listening experience that evolves with the user’s context and preferences.
+Our project is an AI-powered music app that generates personalized playlists by integrating with the Spotify API and OpenAI API. The app tailors music recommendations to each user’s preferences by analyzing various factors such as listening history, current mood, location, weather, time of day, and more. What’s unique about SoundScape are how personalized the playlists are that it creates. It lets users control how much new music they want to discover, blending familiar tracks with fresh selections and accounting for the right mood or timing that may influence what someone wants to hear. This app aims to create a seamless listening experience that evolves with the user’s context and preferences.
 
 # Inadequacy of Current Solutions
 Most current solutions to the problem are only personalized on the level that they give you song recommendations based on your listening history. Prime examples of this are Spotify's current soltuons, being the AI DJ and the AI playlist creator, whcih are widely considered to be problematic. For example, the AI DJ tends to talk a lot, recommend music that does not align with your listening interests, and switches up the feel of the music far too often.
