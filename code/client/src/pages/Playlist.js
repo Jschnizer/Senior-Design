@@ -1,7 +1,7 @@
 // Playlist.js
-import React from 'react';
+import React, { useState } from 'react';
 import SwipeableCard from '../components/SwipeableCard';
-import Loader from '../components/Loader'; // Import your Loader component
+import Loader from '../components/Loader';
 import '../App.css';
 import {
   DndContext,
@@ -18,6 +18,8 @@ import {
   useSortable
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import axios from 'axios';
+import styled from 'styled-components';
 
 function SortableTrack({ track, index, isDiscarded, isInPlaylist, onReshuffle }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: track.id });
@@ -40,7 +42,6 @@ function SortableTrack({ track, index, isDiscarded, isInPlaylist, onReshuffle })
       {(isDiscarded || isInPlaylist) && (
         <button className="reshuffle" onClick={() => onReshuffle(track)}>↩</button>
       )}
-      {/* Drag Handle */}
       <div className="drag-handle" {...attributes} {...listeners}>
         &#9776;
       </div>
@@ -48,8 +49,109 @@ function SortableTrack({ track, index, isDiscarded, isInPlaylist, onReshuffle })
   );
 }
 
-function Playlist({ recommendations, setRecommendations, playlist, setPlaylist, loading }) {
-  const [discarded, setDiscarded] = React.useState([]);
+// Styled Components for Modal
+const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+`;
+
+const ModalBox = styled.div`
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+`;
+
+const ModalTitle = styled.h3`
+  margin-top: 0;
+  color: #333;
+  font-family: 'Arial', sans-serif;
+`;
+
+const ModalInput = styled.input`
+  width: 100%;
+  padding: 0.6rem;
+  font-size: 1rem;
+  margin: 0.5rem 0 1rem 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  color: #333;
+`;
+
+const ModalButtons = styled.div`
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+`;
+
+const ModalButton = styled.button`
+  background-color: ${props => props.variant === 'cancel' ? '#f0f0f0' : '#2c8fff'};
+  color: ${props => props.variant === 'cancel' ? '#333' : '#fff'};
+  border: none;
+  padding: 0.8rem 1.2rem;
+  font-size: 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-family: 'Arial', sans-serif;
+
+  &:hover {
+    background-color: ${props => props.variant === 'cancel' ? '#e0e0e0' : '#1a6bb8'};
+  }
+`;
+
+const ExportButton = styled.button`
+  background-color: #00cc7a;
+  color: #fff;
+  border: none;
+  padding: 0.8rem 1.2rem;
+  font-size: 1rem;
+  border-radius: 4px;
+  margin-top: 2rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-family: 'Arial', sans-serif;
+
+  &:hover {
+    background-color: #009f5c;
+  }
+`;
+
+const SuccessMessage = styled.p`
+  color: #333;
+  font-size: 1rem;
+  margin: 1rem 0;
+  font-family: 'Arial', sans-serif;
+`;
+
+const ErrorMessageText = styled.p`
+  color: #333;
+  font-size: 1rem;
+  margin: 1rem 0;
+  font-family: 'Arial', sans-serif;
+`;
+
+function Playlist({ token, recommendations, setRecommendations, playlist, setPlaylist, loading }) {
+  const [discarded, setDiscarded] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [playlistName, setPlaylistName] = useState("");
+  
+  // States for success and error modals
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleAddToPlaylist = (track) => {
     setPlaylist((prev) => [...prev, track]);
@@ -76,12 +178,38 @@ function Playlist({ recommendations, setRecommendations, playlist, setPlaylist, 
     setList((prev) => arrayMove(prev, oldIndex, newIndex));
   };
 
+  // Function to export current playlist to Spotify
+  const exportToSpotify = async (name) => {
+    if (!token) {
+      alert("Please log in first.");
+      return;
+    }
+    if (playlist.length === 0) {
+      alert("Your playlist is empty.");
+      return;
+    }
+    const trackIds = playlist.map((track) => track.id);
+    try {
+      const response = await axios.post('http://localhost:5000/export', {
+        access_token: token,
+        trackIds,
+        playlistName: name || "My SoundScape Playlist"
+      });
+      
+      setSuccessMessage(`Playlist "${name || "My SoundScape Playlist"}" exported successfully! Check your Spotify account.`);
+      setShowSuccessModal(true);
+    } catch (error) {
+      console.error("Error exporting playlist:", error);
+      setErrorMessage("Error exporting playlist. Please try again later.");
+      setShowErrorModal(true);
+    }
+  };
+
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
-  // If recommendations are still loading, show the Loader
   if (loading) {
     return (
       <div className="loading-container">
@@ -104,7 +232,13 @@ function Playlist({ recommendations, setRecommendations, playlist, setPlaylist, 
               <h3>Discarded Songs</h3>
               {discarded.length > 0 ? (
                 discarded.map((track, index) => (
-                  <SortableTrack key={track.id} track={track} index={index} isDiscarded={true} onReshuffle={handleReshuffle} />
+                  <SortableTrack
+                    key={track.id}
+                    track={track}
+                    index={index}
+                    isDiscarded={true}
+                    onReshuffle={handleReshuffle}
+                  />
                 ))
               ) : (
                 <p>No discarded songs yet.</p>
@@ -140,7 +274,13 @@ function Playlist({ recommendations, setRecommendations, playlist, setPlaylist, 
               <h3>Playlist</h3>
               {playlist.length > 0 ? (
                 playlist.map((track, index) => (
-                  <SortableTrack key={track.id} track={track} index={index} isInPlaylist={true} onReshuffle={handleReshuffle} />
+                  <SortableTrack
+                    key={track.id}
+                    track={track}
+                    index={index}
+                    isInPlaylist={true}
+                    onReshuffle={handleReshuffle}
+                  />
                 ))
               ) : (
                 <p>Your playlist is empty.</p>
@@ -149,6 +289,74 @@ function Playlist({ recommendations, setRecommendations, playlist, setPlaylist, 
           </SortableContext>
         </DndContext>
       </div>
+      
+      {/* Export Button - Positioned below the Playlist section */}
+      <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+        <ExportButton onClick={() => setShowModal(true)}>
+          Export to Spotify
+        </ExportButton>
+      </div>
+
+      {/* Modal for Naming Playlist */}
+      {showModal && (
+        <ModalOverlay>
+          <ModalBox>
+            <ModalTitle>Enter playlist name</ModalTitle>
+            <ModalInput
+              type="text"
+              value={playlistName}
+              onChange={(e) => setPlaylistName(e.target.value)}
+              placeholder="My Awesome Playlist"
+            />
+            <ModalButtons>
+              <ModalButton
+                variant="cancel"
+                onClick={() => {
+                  setShowModal(false);
+                  setPlaylistName("");
+                }}
+              >
+                Cancel
+              </ModalButton>
+              <ModalButton
+                onClick={() => {
+                  exportToSpotify(playlistName);
+                  setShowModal(false);
+                  setPlaylistName("");
+                }}
+              >
+                Create Playlist
+              </ModalButton>
+            </ModalButtons>
+          </ModalBox>
+        </ModalOverlay>
+      )}
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <ModalOverlay>
+          <ModalBox>
+            <ModalTitle>Playlist Exported</ModalTitle>
+            <SuccessMessage>{successMessage}</SuccessMessage>
+            <ModalButton onClick={() => setShowSuccessModal(false)}>
+              Close
+            </ModalButton>
+          </ModalBox>
+        </ModalOverlay>
+      )}
+
+      {/* Error Modal */}
+      {showErrorModal && (
+        <ModalOverlay>
+          <ModalBox>
+            <ModalTitle>Error Exporting Playlist</ModalTitle>
+            <ErrorMessageText>{errorMessage}</ErrorMessageText>
+            <ModalButton onClick={() => setShowErrorModal(false)}>
+              Close
+            </ModalButton>
+          </ModalBox>
+        </ModalOverlay>
+      )}
     </div>
   );
 }

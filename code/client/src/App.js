@@ -171,6 +171,7 @@ function App() {
             path="/playlist"
             element={
               <Playlist
+                token={token} 
                 recommendations={recommendations}
                 setRecommendations={setRecommendations}
                 playlist={playlist}

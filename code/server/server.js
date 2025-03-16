@@ -43,7 +43,7 @@ async function validateAndFetchAlbumCover(rec, accessToken) {
 
 // Spotify login route
 app.get('/login', (req, res) => {
-  const scopes = 'user-read-private user-read-email user-top-read';
+  const scopes = 'user-read-private user-read-email user-top-read playlist-modify-public';
   res.redirect(
     'https://accounts.spotify.com/authorize?' +
       new URLSearchParams({
@@ -242,6 +242,68 @@ app.get('/weather', async (req, res) => {
     res.status(500).json({ error: 'Unable to fetch weather data' });
   }
 });
+
+// Endpoint to export playlist to Spotify
+app.post('/export', async (req, res) => {
+  const { access_token, trackIds, playlistName } = req.body;
+
+  if (!access_token || !trackIds || !trackIds.length) {
+    return res.status(400).json({ error: "Missing access token or track IDs" });
+  }
+
+  try {
+    // Step 1: Get the user's Spotify ID
+    const userResponse = await axios.get('https://api.spotify.com/v1/me', {
+      headers: { Authorization: `Bearer ${access_token}` },
+    });
+    const userId = userResponse.data.id;
+
+    // Step 2: Create a new playlist for the user
+    const createResponse = await axios.post(
+      `https://api.spotify.com/v1/users/${userId}/playlists`,
+      {
+        name: playlistName || "My SoundScape Playlist",
+        public: true,
+        description: "Playlist exported from SoundScape",
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    const playlistId = createResponse.data.id;
+
+    // Step 3: Convert track IDs to Spotify track URIs
+    const uris = trackIds.map(id => `spotify:track:${id}`);
+
+    // Spotify allows adding up to 100 tracks per request.
+    const chunkSize = 100;
+    for (let i = 0; i < uris.length; i += chunkSize) {
+      const chunk = uris.slice(i, i + chunkSize);
+      await axios.post(
+        `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+        { uris: chunk },
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+    }
+
+    res.json({
+      playlistId,
+      playlistUrl: createResponse.data.external_urls.spotify,
+    });
+  } catch (error) {
+    console.error("Error exporting playlist:", error.response?.data || error.message);
+    res.status(500).json({ error: "Error exporting playlist" });
+  }
+});
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
