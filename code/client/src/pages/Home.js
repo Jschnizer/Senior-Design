@@ -4,6 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import '../App.css';
 import GenerateButton from '../components/GenerateButton';
 import WeatherSwitch from '../components/WeatherSwitch';
+import TopArtistsSelector from '../components/TopArtistsSelector';
+import GenreSelector from '../components/GenereSelector';
+import MoodRadio from '../components/MoodRadio';
 
 function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendations, weatherData, fetchWeather }) {
   const navigate = useNavigate();
@@ -27,7 +30,7 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
   }, [useWeather, fetchWeather]);
 
   const handleGeneratePlaylist = () => {
-    fetchRecommendations(mood, percentNew, genres, tempo, minDuration, maxDuration, useWeather);
+    fetchRecommendations(mood, percentNew, genres, tempo, minDuration, maxDuration, useWeather, selectedArtists);
     navigate('/playlist');
   };
 
@@ -36,16 +39,10 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
       <h2 className="form-section-title">Tune Your Playlist</h2>
       <div className="inputs-grid">
         {/* Mood */}
-        <label>
-          Mood
-          <select value={mood} onChange={(e) => setMood(e.target.value)}>
-            <option value="">Select Mood</option>
-            <option value="happy">Happy</option>
-            <option value="sad">Sad</option>
-            <option value="energetic">Energetic</option>
-            <option value="relaxed">Relaxed</option>
-          </select>
-        </label>
+        <div className="mood-row">
+          <p>Mood</p>
+          <MoodRadio mood={mood} setMood={setMood} />
+        </div>
 
         {/* Discovery */}
         <label>
@@ -61,36 +58,6 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
           <span className="range-value">{Math.round(percentNew * 100)}%</span>
         </label>
 
-        {/* Max Tracks */}
-        <label>
-          Max Tracks to Display
-          <input
-            type="number"
-            min="1"
-            max="50"
-            value={maxTracks}
-            onChange={(e) => setMaxTracks(Number(e.target.value))}
-          />
-        </label>
-
-        {/* Genres */}
-        <label>
-          Genres
-          <select
-            multiple
-            value={genres}
-            onChange={(e) =>
-              setGenres(Array.from(e.target.selectedOptions, (option) => option.value))
-            }
-          >
-            <option value="pop">Pop</option>
-            <option value="rock">Rock</option>
-            <option value="jazz">Jazz</option>
-            <option value="classical">Classical</option>
-            <option value="hiphop">Hip Hop</option>
-          </select>
-        </label>
-
         {/* Tempo */}
         <label>
           Tempo (BPM)
@@ -102,6 +69,18 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
             onChange={(e) => setTempo(Number(e.target.value))}
           />
           <span className="range-value">{tempo} BPM</span>
+        </label>
+
+        {/* Max Tracks */}
+        <label>
+          Max Tracks to Display
+          <input
+            type="number"
+            min="1"
+            max="50"
+            value={maxTracks}
+            onChange={(e) => setMaxTracks(Number(e.target.value))}
+          />
         </label>
 
         {/* Use Weather Switch */}
@@ -139,21 +118,24 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
           />
         </label>
 
-        {/* Filter by Artist */}
-        <label>
-          Filter by Artist
-          <select
-            multiple
-            value={selectedArtists}
-            onChange={(e) =>
-              setSelectedArtists(Array.from(e.target.selectedOptions, (option) => option.value))
-            }
-          >
-            <option value="artist1">Artist 1</option>
-            <option value="artist2">Artist 2</option>
-            <option value="artist3">Artist 3</option>
-          </select>
-        </label>
+        {/* Genres */}
+        <div className="genres-row">
+          <p style={{ marginBottom: '0.5rem' }}>Genres</p>
+          <GenreSelector
+            selectedGenres={genres}
+            setSelectedGenres={setGenres}
+          />
+        </div>
+
+        {/* Let user select top artists via chips */}
+        <div className="top-artists-row">
+          <h3>Select Your Top Artists</h3>
+          <TopArtistsSelector
+            token={token}
+            selectedArtists={selectedArtists}
+            setSelectedArtists={setSelectedArtists}
+          />
+        </div>
       </div>
 
       {weatherData && (

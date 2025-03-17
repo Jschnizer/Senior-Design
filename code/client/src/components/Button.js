@@ -18,7 +18,7 @@ const StyledWrapper = styled.div`
     letter-spacing: 2.5px;
     font-weight: 500;
     color: #fff;
-    background-color: #DC3232;
+    background-color: #2871F1;
     border: none;
     border-radius: 45px;
     box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);

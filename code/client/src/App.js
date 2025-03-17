@@ -133,7 +133,7 @@ function App() {
     );
   };
 
-  const fetchRecommendations = (mood, percentNew, weather, genres, tempo, minDuration, maxDuration, useWeather) => {
+  const fetchRecommendations = (mood, percentNew, weather, genres, tempo, minDuration, maxDuration, useWeather, selectedArtists) => {
     if (!token) {
       alert('Please log in first!');
       return;
@@ -155,7 +155,9 @@ function App() {
       useWeather,
       history,
       access_token: token,
+      selectedArtists
     };
+    console.log('Payload:', payload);
     axios
       .post('http://localhost:5000/recommend', payload)
       .then((response) => {

@@ -22,6 +22,7 @@ const Container = styled.div`
   color: #fff;
   text-align: center;
   padding: 0 20px;
+  font-family: 'Poppins', sans-serif; /* match your app’s font */
 `;
 
 const Title = styled.h1`

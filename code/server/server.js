@@ -178,7 +178,8 @@ app.post('/recommend', async (req, res) => {
       maxDuration,      // in minutes (e.g., 5)
       useWeather,       // boolean: whether to use weather info
       history,          // array of strings, e.g. ["Song A by Artist1", "Song B by Artist2", ...]
-      access_token      // Spotify access token for retrieving album covers
+      access_token,      // Spotify access token for retrieving album covers
+      selectedArtists   // array of selected artist IDs
     } = req.body;
 
     // Determine a time-of-day description.
@@ -208,6 +209,7 @@ Context:
 - Preferred Tempo: around ${tempo} BPM
 - Duration Range: ${minDuration} to ${maxDuration} minutes
 - Preferred Genres: ${genres && genres.length ? genres.join(", ") : "any"}
+- Selected Artists: ${selectedArtists && selectedArtists.length ? selectedArtists.join(", ") : "any"}
 
 For each recommended track, please provide:
 - Spotify track ID (if available; if not, leave as null)
