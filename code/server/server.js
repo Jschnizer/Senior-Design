@@ -56,6 +56,40 @@ app.get('/login', (req, res) => {
   );
 });
 
+// Route to refresh the access token using a refresh token
+app.post('/refresh', async (req, res) => {
+  const { refresh_token } = req.body;
+  if (!refresh_token) {
+    return res.status(400).json({ error: 'Missing refresh token' });
+  }
+  try {
+    const authOptions = {
+      url: 'https://accounts.spotify.com/api/token',
+      data: new URLSearchParams({
+        grant_type: 'refresh_token',
+        refresh_token: refresh_token,
+      }),
+      headers: {
+        Authorization:
+          'Basic ' +
+          Buffer.from(
+            process.env.SPOTIFY_CLIENT_ID + ':' + process.env.SPOTIFY_CLIENT_SECRET
+          ).toString('base64'),
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    };
+
+    const response = await axios.post(authOptions.url, authOptions.data, {
+      headers: authOptions.headers,
+    });
+    res.json(response.data);
+  } catch (error) {
+    console.error("Error refreshing token:", error.response?.data || error.message);
+    res.status(500).json({ error: "Error refreshing token" });
+  }
+});
+
+
 // Generate random string for Spotify's state parameter
 function generateRandomString(length) {
   let text = '';

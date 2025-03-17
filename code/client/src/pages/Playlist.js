@@ -2,6 +2,11 @@
 import React, { useState } from 'react';
 import SwipeableCard from '../components/SwipeableCard';
 import Loader from '../components/Loader';
+import ExportButton from '../components/ExportButton';
+import Input from '../components/Input';
+import BackButton from '../components/BackButton';
+import Confirm from '../components/Confirm';
+import Button from '../components/Button';
 import '../App.css';
 import {
   DndContext,
@@ -108,23 +113,6 @@ const ModalButton = styled.button`
 
   &:hover {
     background-color: ${props => props.variant === 'cancel' ? '#e0e0e0' : '#1a6bb8'};
-  }
-`;
-
-const ExportButton = styled.button`
-  background-color: #00cc7a;
-  color: #fff;
-  border: none;
-  padding: 0.8rem 1.2rem;
-  font-size: 1rem;
-  border-radius: 4px;
-  margin-top: 2rem;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  font-family: 'Arial', sans-serif;
-
-  &:hover {
-    background-color: #009f5c;
   }
 `;
 
@@ -257,6 +245,11 @@ function Playlist({ token, recommendations, setRecommendations, playlist, setPla
                 <button className="red" onClick={() => handleDiscard(recommendations[0])}>−</button>
                 <button className="green" onClick={() => handleAddToPlaylist(recommendations[0])}>+</button>
               </div>
+
+              {/* Export Button directly under plus/minus buttons */}
+              <div style={{ marginTop: '700px', position: 'absolute'}}>
+                <ExportButton onClick={() => setShowModal(true)} />
+              </div>
             </div>
           ) : (
             <p>No more songs to swipe.</p>
@@ -289,44 +282,28 @@ function Playlist({ token, recommendations, setRecommendations, playlist, setPla
           </SortableContext>
         </DndContext>
       </div>
-      
-      {/* Export Button - Positioned below the Playlist section */}
-      <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-        <ExportButton onClick={() => setShowModal(true)}>
-          Export to Spotify
-        </ExportButton>
-      </div>
 
       {/* Modal for Naming Playlist */}
       {showModal && (
         <ModalOverlay>
           <ModalBox>
             <ModalTitle>Enter playlist name</ModalTitle>
-            <ModalInput
-              type="text"
+            <Input
               value={playlistName}
               onChange={(e) => setPlaylistName(e.target.value)}
-              placeholder="My Awesome Playlist"
             />
             <ModalButtons>
-              <ModalButton
-                variant="cancel"
-                onClick={() => {
+              <BackButton onClick={() => {
                   setShowModal(false);
                   setPlaylistName("");
-                }}
-              >
-                Cancel
-              </ModalButton>
-              <ModalButton
-                onClick={() => {
+                }
+              }></BackButton>
+              <Confirm onClick={() => {
                   exportToSpotify(playlistName);
                   setShowModal(false);
                   setPlaylistName("");
-                }}
-              >
-                Create Playlist
-              </ModalButton>
+                }
+              }></Confirm>
             </ModalButtons>
           </ModalBox>
         </ModalOverlay>
@@ -338,9 +315,10 @@ function Playlist({ token, recommendations, setRecommendations, playlist, setPla
           <ModalBox>
             <ModalTitle>Playlist Exported</ModalTitle>
             <SuccessMessage>{successMessage}</SuccessMessage>
-            <ModalButton onClick={() => setShowSuccessModal(false)}>
-              Close
-            </ModalButton>
+            <Button 
+              text="Close"
+              onClick={() => setShowSuccessModal(false)}
+            ></Button>
           </ModalBox>
         </ModalOverlay>
       )}

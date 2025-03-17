@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+// Home.js
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../App.css';
+import GenerateButton from '../components/GenerateButton';
+import WeatherSwitch from '../components/WeatherSwitch';
 
-function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendations, weatherData }) {
+function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendations, weatherData, fetchWeather }) {
   const navigate = useNavigate();
 
   // Local state for contextual inputs
@@ -16,19 +19,25 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
   const [maxDuration, setMaxDuration] = useState(30);
   const [selectedArtists, setSelectedArtists] = useState([]);
 
-  const handleGeneratePlaylist = (mood, percentNew, genres, tempo, minDuration, maxDuration, useWeather) => {
-    // Since the recommendation endpoint is not working yet fetch the user's top songs instead.
+  // When the weather toggle is enabled, automatically fetch weather data.
+  useEffect(() => {
+    if (useWeather) {
+      fetchWeather();
+    }
+  }, [useWeather, fetchWeather]);
+
+  const handleGeneratePlaylist = () => {
     fetchRecommendations(mood, percentNew, genres, tempo, minDuration, maxDuration, useWeather);
     navigate('/playlist');
   };
 
   return (
     <div className="content">
-      <h2>Contextual Inputs</h2>
+      <h2 className="form-section-title">Tune Your Playlist</h2>
       <div className="inputs-grid">
         {/* Mood */}
         <label>
-          Mood:
+          Mood
           <select value={mood} onChange={(e) => setMood(e.target.value)}>
             <option value="">Select Mood</option>
             <option value="happy">Happy</option>
@@ -37,9 +46,10 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
             <option value="relaxed">Relaxed</option>
           </select>
         </label>
+
         {/* Discovery */}
         <label>
-          Discovery (% New Songs):
+          Discovery (% New Songs)
           <input
             type="range"
             min="0"
@@ -48,10 +58,12 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
             value={percentNew}
             onChange={(e) => setPercentNew(Number(e.target.value))}
           />
+          <span className="range-value">{Math.round(percentNew * 100)}%</span>
         </label>
+
         {/* Max Tracks */}
         <label>
-          Max Tracks to Display:
+          Max Tracks to Display
           <input
             type="number"
             min="1"
@@ -60,9 +72,10 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
             onChange={(e) => setMaxTracks(Number(e.target.value))}
           />
         </label>
+
         {/* Genres */}
         <label>
-          Genres:
+          Genres
           <select
             multiple
             value={genres}
@@ -77,9 +90,10 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
             <option value="hiphop">Hip Hop</option>
           </select>
         </label>
+
         {/* Tempo */}
         <label>
-          Tempo (BPM):
+          Tempo (BPM)
           <input
             type="range"
             min="1"
@@ -87,19 +101,23 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
             value={tempo}
             onChange={(e) => setTempo(Number(e.target.value))}
           />
+          <span className="range-value">{tempo} BPM</span>
         </label>
-        {/* Use Weather */}
-        <label>
-          <input
-            type="checkbox"
+
+        {/* Use Weather Switch */}
+        <div>
+          <p style={{ marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
+            Use Weather Conditions
+          </p>
+          <WeatherSwitch
             checked={useWeather}
             onChange={(e) => setUseWeather(e.target.checked)}
           />
-          Use Weather Conditions
-        </label>
+        </div>
+
         {/* Minimum Duration */}
         <label>
-          Minimum Song Duration (Minutes):
+          Min Duration (Minutes)
           <input
             type="number"
             min="1"
@@ -108,9 +126,10 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
             onChange={(e) => setMinDuration(Number(e.target.value))}
           />
         </label>
+
         {/* Maximum Duration */}
         <label>
-          Maximum Song Duration (Minutes):
+          Max Duration (Minutes)
           <input
             type="number"
             min="10"
@@ -119,9 +138,10 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
             onChange={(e) => setMaxDuration(Number(e.target.value))}
           />
         </label>
+
         {/* Filter by Artist */}
         <label>
-          Filter by Artist:
+          Filter by Artist
           <select
             multiple
             value={selectedArtists}
@@ -145,11 +165,8 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
         </div>
       )}
 
-      {/* Generate Playlist button at the bottom */}
-      <div style={{ marginTop: '2rem' }}>
-        <button onClick={() => handleGeneratePlaylist(mood, percentNew, genres, tempo, minDuration, maxDuration, useWeather)}>
-          Generate Playlist
-        </button>
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '2rem' }}>
+        <GenerateButton onClick={handleGeneratePlaylist} />
       </div>
     </div>
   );
