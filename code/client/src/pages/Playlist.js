@@ -7,6 +7,8 @@ import Input from '../components/Input';
 import BackButton from '../components/BackButton';
 import Confirm from '../components/Confirm';
 import Button from '../components/Button';
+import PlusButton from '../components/PlusButton';
+import MinusButton from '../components/MinusButton';
 import '../App.css';
 import {
   DndContext,
@@ -242,8 +244,8 @@ function Playlist({ token, recommendations, setRecommendations, playlist, setPla
             <div className="swipe-card-wrapper">
               <SwipeableCard track={recommendations[0]} />
               <div className="button-group">
-                <button className="red" onClick={() => handleDiscard(recommendations[0])}>−</button>
-                <button className="green" onClick={() => handleAddToPlaylist(recommendations[0])}>+</button>
+                <MinusButton onClick={() => handleDiscard(recommendations[0])} />
+                <PlusButton onClick={() => handleAddToPlaylist(recommendations[0])} />
               </div>
 
               {/* Export Button directly under plus/minus buttons */}
