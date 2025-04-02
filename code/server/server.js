@@ -160,9 +160,9 @@ app.get('/me', (req, res) => {
     .then((response) => {
       res.json(response.data);
     })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).send('Error fetching user data');
+    .catch(err => {
+      console.error("Error fetching user data from Spotify:", err.response?.data || err.message);
+      res.status(500).json({ error: "Error fetching user data" });
     });
 });
 
@@ -179,7 +179,7 @@ app.post('/recommend', async (req, res) => {
       useWeather,       // boolean: whether to use weather info
       history,          // array of strings, e.g. ["Song A by Artist1", "Song B by Artist2", ...]
       access_token,      // Spotify access token for retrieving album covers
-      selectedArtists   // array of selected artist IDs
+      selectedArtists   // array of selected artist names
     } = req.body;
 
     // Determine a time-of-day description.
@@ -197,7 +197,7 @@ app.post('/recommend', async (req, res) => {
 
     // Construct the prompt for ChatGPT.
     const prompt = `
-You are a music recommendation assistant. Based on the contextual information and the user's listening history provided below, please generate a ranked list of 25 Spotify track recommendations that blend familiar tracks with new discoveries. The blend should be controlled by the "percentNew" value, where 0.0 means all recommendations should be similar to the user's current tastes, and 1.0 means all recommendations should be new and experimental. Only return songs that you are sure exist on Spotify and include their valid Spotify track IDs if available.
+You are a music recommendation assistant. Based on the contextual information and the user's listening history provided below, please generate a ranked list of 25 Spotify track recommendations that blend familiar tracks with new discoveries. The blend should be controlled by the "percentNew" value, where 0.0 means all recommendations should be similar to the user's current tastes, and 1.0 means all recommendations should be new and experimental. Only return songs that you are sure exist on Spotify and include their valid Spotify track IDs if available. Also be sure to include at least one song from each of the selected artists if provided.
 
 ${historyText}
 

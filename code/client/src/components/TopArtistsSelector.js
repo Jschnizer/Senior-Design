@@ -12,7 +12,7 @@ function TopArtistsSelector({ token, selectedArtists, setSelectedArtists }) {
     axios
       .get('https://api.spotify.com/v1/me/top/artists', {
         headers: { Authorization: `Bearer ${token}` },
-        params: { limit: 20 }, // adjust limit as needed
+        params: { limit: 20 },
       })
       .then((res) => {
         setTopArtists(res.data.items || []);
@@ -23,25 +23,23 @@ function TopArtistsSelector({ token, selectedArtists, setSelectedArtists }) {
   }, [token]);
 
   // Toggle selection when user clicks on an artist chip
-  const handleClick = (artistId) => {
-    if (selectedArtists.includes(artistId)) {
-      // Remove if already selected
-      setSelectedArtists((prev) => prev.filter((id) => id !== artistId));
+  const handleClick = (artist) => {
+    if (selectedArtists.some((a) => a.id === artist.id)) {
+      setSelectedArtists(selectedArtists.filter((a) => a.id !== artist.id));
     } else {
-      // Add if not selected
-      setSelectedArtists((prev) => [...prev, artistId]);
+      setSelectedArtists([...selectedArtists, { id: artist.id, name: artist.name }]);
     }
   };
 
   return (
     <ChipsContainer>
       {topArtists.map((artist) => {
-        const isSelected = selectedArtists.includes(artist.id);
+        const isSelected = selectedArtists.some((a) => a.id === artist.id);
         return (
           <ArtistChip
             key={artist.id}
             selected={isSelected}
-            onClick={() => handleClick(artist.id)}
+            onClick={() => handleClick(artist)}
           >
             {artist.name}
           </ArtistChip>

@@ -34,6 +34,7 @@ function App() {
       }
     }
     setToken(savedToken);
+    // fetchWeather();
   }, []);
 
   // Axios interceptor for refreshing token on 401
@@ -119,6 +120,7 @@ function App() {
             params: { lat: latitude, lon: longitude },
           })
           .then((response) => {
+            console.log('Weather Data:', response.data);
             setWeatherData(response.data);
           })
           .catch((error) => {
@@ -133,17 +135,17 @@ function App() {
     );
   };
 
-  const fetchRecommendations = (mood, percentNew, weather, genres, tempo, minDuration, maxDuration, useWeather, selectedArtists) => {
+  const fetchRecommendations = (mood, percentNew, genres, tempo, minDuration, maxDuration, useWeather, selectedArtists) => {
     if (!token) {
       alert('Please log in first!');
       return;
     }
     setLoading(true);
+    const artistNames = selectedArtists.map(artist => artist.name);
     const currentWeather = weatherData?.weather[0]?.description || '';
     const history = userData && userData.items
       ? userData.items.map(track => `${track.name} by ${track.artists[0].name}`)
       : [];
-    console.log('History:', history);
     const payload = {
       mood,
       percentNew,
@@ -155,21 +157,20 @@ function App() {
       useWeather,
       history,
       access_token: token,
-      selectedArtists
+      artistNames,
     };
-    console.log('Payload:', payload);
-    axios
-      .post('http://localhost:5000/recommend', payload)
-      .then((response) => {
+    console.log('Recommendation payload:', payload);
+    axios.post('http://localhost:5000/recommend', payload)
+      .then(response => {
         setRecommendations(response.data.recommendations);
         setLoading(false);
       })
-      .catch((error) => {
+      .catch(error => {
         console.error('Error fetching recommendations:', error);
         alert('Failed to fetch recommendations.');
         setLoading(false);
       });
-  };
+  };  
 
   // If no token exists, show the login page
   if (!token) {
@@ -204,6 +205,7 @@ function App() {
                 recommendations={recommendations}
                 fetchRecommendations={fetchRecommendations}
                 weatherData={weatherData}
+                fetchWeather={fetchWeather}
               />
             }
           />

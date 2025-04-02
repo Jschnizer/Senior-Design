@@ -7,6 +7,7 @@ import WeatherSwitch from '../components/WeatherSwitch';
 import TopArtistsSelector from '../components/TopArtistsSelector';
 import GenreSelector from '../components/GenereSelector';
 import MoodRadio from '../components/MoodRadio';
+import WeatherCard from '../components/WeatherCard';
 
 function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendations, weatherData, fetchWeather }) {
   const navigate = useNavigate();
@@ -24,10 +25,10 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
 
   // When the weather toggle is enabled, automatically fetch weather data.
   useEffect(() => {
-    if (useWeather) {
+    if (useWeather && !weatherData) {
       fetchWeather();
     }
-  }, [useWeather, fetchWeather]);
+  }, [useWeather]);
 
   const handleGeneratePlaylist = () => {
     fetchRecommendations(mood, percentNew, genres, tempo, minDuration, maxDuration, useWeather, selectedArtists);
@@ -90,7 +91,9 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
           </p>
           <WeatherSwitch
             checked={useWeather}
-            onChange={(e) => setUseWeather(e.target.checked)}
+            onChange={(e) => {
+              setUseWeather(e.target.checked);
+            }}
           />
         </div>
 
@@ -118,6 +121,16 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
           />
         </label>
 
+        {/* If weather is enabled, show the weather card above genres */}
+        {useWeather && weatherData && (
+          <div className="weather-card-row" style={{ gridColumn: '1 / 4', display: 'flex', justifyContent: 'center', margin: '1rem 0' }}>
+            <WeatherCard
+              weatherData={weatherData}
+              iconUrl={`https://openweathermap.org/img/wn/${weatherData.weather[0].icon}@2x.png`}
+            />
+          </div>
+        )}
+
         {/* Genres */}
         <div className="genres-row">
           <p style={{ marginBottom: '0.5rem' }}>Genres</p>
@@ -138,14 +151,14 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
         </div>
       </div>
 
-      {weatherData && (
+      {/* {weatherData && (
         <div className="weather-data">
           <h2>Current Weather</h2>
           <p>Location: {weatherData.name}</p>
           <p>Temperature: {weatherData.main.temp} °F</p>
           <p>Weather: {weatherData.weather[0]?.description}</p>
         </div>
-      )}
+      )} */}
 
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: '2rem' }}>
         <GenerateButton onClick={handleGeneratePlaylist} />

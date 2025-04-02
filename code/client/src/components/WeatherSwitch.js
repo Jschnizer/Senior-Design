@@ -1,11 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const WeatherSwitch = () => {
+const WeatherSwitch = ({checked, onChange}) => {
   return (
     <StyledWrapper>
       <label className="switch">
-        <input defaultChecked type="checkbox" />
+        <input defaultChecked type="checkbox" checked={checked} onChange={onChange} />
         <div className="slider">
           <div className="circle">
             <svg className="cross" xmlSpace="preserve" style={{enableBackground: 'new 0 0 512 512'}} viewBox="0 0 365.696 365.696" y={0} x={0} height={6} width={6} xmlnsXlink="http://www.w3.org/1999/xlink" version="1.1" xmlns="http://www.w3.org/2000/svg">
