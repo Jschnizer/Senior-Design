@@ -37,10 +37,10 @@ function SortableTrack({ track, index, isDiscarded, isInPlaylist, onReshuffle })
 
   return (
     <div ref={setNodeRef} style={style} className="track-item">
-      <img 
-        src={track.albumCover || 'https://via.placeholder.com/150'} 
-        alt={track.name} 
-        className="album-cover" 
+      <img
+        src={track.albumCover || 'https://via.placeholder.com/150'}
+        alt={track.name}
+        className="album-cover"
       />
       <div className="track-info">
         <span>{track.name}</span>
@@ -136,7 +136,7 @@ function Playlist({ token, recommendations, setRecommendations, playlist, setPla
   const [discarded, setDiscarded] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [playlistName, setPlaylistName] = useState("");
-  
+
   // States for success and error modals
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -185,7 +185,7 @@ function Playlist({ token, recommendations, setRecommendations, playlist, setPla
         trackIds,
         playlistName: name || "My SoundScape Playlist"
       });
-      
+
       setSuccessMessage(`Playlist "${name || "My SoundScape Playlist"}" exported successfully! Check your Spotify account.`);
       setShowSuccessModal(true);
     } catch (error) {
@@ -249,7 +249,7 @@ function Playlist({ token, recommendations, setRecommendations, playlist, setPla
               </div>
 
               {/* Export Button directly under plus/minus buttons */}
-              <div style={{ marginTop: '700px', position: 'absolute'}}>
+              <div style={{ marginTop: '700px', position: 'absolute' }}>
                 <ExportButton onClick={() => setShowModal(true)} />
               </div>
             </div>
@@ -296,15 +296,15 @@ function Playlist({ token, recommendations, setRecommendations, playlist, setPla
             />
             <ModalButtons>
               <BackButton onClick={() => {
-                  setShowModal(false);
-                  setPlaylistName("");
-                }
+                setShowModal(false);
+                setPlaylistName("");
+              }
               }></BackButton>
               <Confirm onClick={() => {
-                  exportToSpotify(playlistName);
-                  setShowModal(false);
-                  setPlaylistName("");
-                }
+                exportToSpotify(playlistName);
+                setShowModal(false);
+                setPlaylistName("");
+              }
               }></Confirm>
             </ModalButtons>
           </ModalBox>
@@ -317,7 +317,7 @@ function Playlist({ token, recommendations, setRecommendations, playlist, setPla
           <ModalBox>
             <ModalTitle>Playlist Exported</ModalTitle>
             <SuccessMessage>{successMessage}</SuccessMessage>
-            <Button 
+            <Button
               text="Close"
               onClick={() => setShowSuccessModal(false)}
             ></Button>
