@@ -1,4 +1,3 @@
-// Playlist.js
 import React, { useState } from 'react';
 import SwipeableCard from '../components/SwipeableCard';
 import Loader from '../components/Loader';
@@ -16,7 +15,9 @@ import {
   useSensor,
   useSensors,
   PointerSensor,
-  KeyboardSensor
+  KeyboardSensor,
+  MouseSensor,
+  TouchSensor
 } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -29,14 +30,27 @@ import axios from 'axios';
 import styled from 'styled-components';
 
 function SortableTrack({ track, index, isDiscarded, isInPlaylist, onReshuffle }) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: track.id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: track.id
+  });
+
   const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
+    transform: CSS.Transform.toString({
+      ...transform,
+      x: 0, // This forces horizontal position to stay at 0
+    }),
+    transition: isDragging ? 'none' : transition,
+    opacity: isDragging ? 0.8 : 1,
+    zIndex: isDragging ? 1 : 'auto',
+    touchAction: 'none', // Prevent touch scrolling during drag
   };
 
   return (
-    <div ref={setNodeRef} style={style} className="track-item">
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="track-item"
+    >
       <img
         src={track.albumCover || 'https://via.placeholder.com/150'}
         alt={track.name}
@@ -49,7 +63,11 @@ function SortableTrack({ track, index, isDiscarded, isInPlaylist, onReshuffle })
       {(isDiscarded || isInPlaylist) && (
         <button className="reshuffle" onClick={() => onReshuffle(track)}>↩</button>
       )}
-      <div className="drag-handle" {...attributes} {...listeners}>
+      <div
+        className="drag-handle"
+        {...attributes}
+        {...listeners}
+      >
         &#9776;
       </div>
     </div>
@@ -159,15 +177,6 @@ function Playlist({ token, recommendations, setRecommendations, playlist, setPla
     setDiscarded((prev) => prev.filter((t) => t.id !== track.id));
   };
 
-  const handleDragEnd = (event, list, setList) => {
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
-
-    const oldIndex = list.findIndex((item) => item.id === active.id);
-    const newIndex = list.findIndex((item) => item.id === over.id);
-    setList((prev) => arrayMove(prev, oldIndex, newIndex));
-  };
-
   // Function to export current playlist to Spotify
   const exportToSpotify = async (name) => {
     if (!token) {
@@ -196,9 +205,42 @@ function Playlist({ token, recommendations, setRecommendations, playlist, setPla
   };
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 1, // Reduce the distance to make dragging easier
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
   );
+
+  // Modify handleDragEnd to ensure we only move items vertically
+  const handleDragEnd = (event, list, setList) => {
+    const { active, over } = event;
+
+    handleDragCancel();
+
+    if (!over || active.id === over.id) return;
+
+    // Force reset transform on all items
+    document.querySelectorAll('.track-item').forEach(item => {
+      item.style.transform = 'translate3d(0px, 0px, 0px)';
+    });
+
+    setList((prev) => {
+      const oldIndex = prev.findIndex((item) => item.id === active.id);
+      const newIndex = prev.findIndex((item) => item.id === over.id);
+      return arrayMove(prev, oldIndex, newIndex);
+    });
+  };
+
+  const handleDragCancel = () => {
+    // Reset transform on all items
+    document.querySelectorAll('.track-item').forEach(item => {
+      item.style.transform = 'translate3d(0px, 0px, 0px)';
+    });
+  };
 
   if (loading) {
     return (
@@ -216,6 +258,7 @@ function Playlist({ token, recommendations, setRecommendations, playlist, setPla
           sensors={sensors}
           collisionDetection={closestCenter}
           onDragEnd={(event) => handleDragEnd(event, discarded, setDiscarded)}
+          onDragCancel={handleDragCancel}
         >
           <SortableContext items={discarded.map((track) => track.id)}>
             <div className="discard-list">
@@ -254,7 +297,11 @@ function Playlist({ token, recommendations, setRecommendations, playlist, setPla
               </div>
             </div>
           ) : (
-            <p>No more songs to swipe.</p>
+            <div
+              style={{ marginTop: '300px', position: 'absolute' }}>
+              <ExportButton onClick={() => setShowModal(true)} />
+            </div>
+
           )}
         </div>
 
@@ -263,6 +310,7 @@ function Playlist({ token, recommendations, setRecommendations, playlist, setPla
           sensors={sensors}
           collisionDetection={closestCenter}
           onDragEnd={(event) => handleDragEnd(event, playlist, setPlaylist)}
+          onDragCancel={handleDragCancel}
         >
           <SortableContext items={playlist.map((track) => track.id)}>
             <div className="playlist-list">
