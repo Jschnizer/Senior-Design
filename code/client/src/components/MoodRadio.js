@@ -1,121 +1,60 @@
 // MoodRadio.js
 import React from 'react';
 import styled from 'styled-components';
+import Checkbox from './Checkbox';
 
-// Example array of moods
-const moods = [
-  { id: 'mood-happy', label: 'Happy', value: 'happy' },
-  { id: 'mood-sad', label: 'Sad', value: 'sad' },
-  { id: 'mood-energetic', label: 'Energetic', value: 'energetic' },
-  { id: 'mood-relaxed', label: 'Relaxed', value: 'relaxed' },
-];
+const availableMoods = ["Happy", "Sad", "Energetic", "Relaxed", "Angry", "Scared", "Optimistic", "Romantic", "Goofy", "Sentimental", "Lovesick", "Bitter"];
 
-function MoodRadio({ mood, setMood }) {
+function moodSelector({ selectedMoods, setSelectedMoods }) {
+  const toggleMood = (mood) => {
+    if (selectedMoods.includes(mood)) {
+      // remove from array
+      setSelectedMoods(selectedMoods.filter((g) => g !== mood));
+    } else {
+      // add to array
+      setSelectedMoods([...selectedMoods, mood]);
+    }
+  };
+
   return (
-    <StyledWrapper>
-      <div className="radio-input">
-        {moods.map(({ id, label, value }) => (
-          <label className="label" key={id}>
-            <input
-              type="radio"
-              id={id}
-              name="mood-radio"
-              value={value}
-              checked={mood === value}
-              onChange={() => setMood(value)}
+    <MoodsContainer>
+      {availableMoods.map((mood) => {
+        const isChecked = selectedMoods.includes(mood);
+        return (
+          <div key={mood} className="mood-item">
+            <Checkbox
+              id={`cbx-${mood}`}
+              checked={isChecked}
+              onChange={() => toggleMood(mood)}
             />
-            <p className="text">{label}</p>
-          </label>
-        ))}
-      </div>
-    </StyledWrapper>
+            <label htmlFor={`cbx-${mood}`} className="mood-label">
+              {mood}
+            </label>
+          </div>
+        );
+      })}
+    </MoodsContainer>
   );
 }
 
-const StyledWrapper = styled.div`
-  /* Use a horizontal layout */
-  .radio-input {
+// Some simple styling
+const MoodsContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+
+  .mood-item {
     display: flex;
-    flex-direction: row;
-    gap: 1rem; /* space between mood options */
-    justify-content: center; /* center them horizontally */
     align-items: center;
+    gap: 0.5rem;
   }
 
-  .label {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 0.3rem 1rem;
+  .mood-label {
+    text-transform: capitalize;
     cursor: pointer;
-    height: auto;
-    position: relative;
-    border-radius: 10px;
-    transition: background-color 0.2s ease, border 0.2s ease;
-    font-family: 'Poppins', sans-serif; /* match your app’s font */
-  }
-
-  /* Hover effect for each label */
-  .label:hover {
-    background-color: #2a2e3c;
-  }
-
-  /* Selected (checked) style */
-  .label:has(input:checked) {
-    background-color: #2d3750;
-    border: 2px solid #435dd8;
-  }
-
-  .text {
-    color: #fff;
-    font-size: 0.95rem;
-    margin: 0;
-  }
-
-  /* Hide the default radio appearance */
-  .label input[type="radio"] {
-    background-color: #202030;
-    appearance: none;
-    width: 17px;
-    height: 17px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-  }
-
-  /* Show a dot when checked */
-  .label input[type="radio"]:checked {
-    background-color: #435dd8;
-    animation: pulse 0.7s forwards;
-  }
-
-  .label input[type="radio"]::before {
-    content: "";
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    transition: all 0.1s cubic-bezier(0.165, 0.84, 0.44, 1);
-    background-color: #fff;
-    transform: scale(0);
-  }
-
-  .label input[type="radio"]:checked::before {
-    transform: scale(1);
-  }
-
-  @keyframes pulse {
-    0% {
-      box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
-    }
-    70% {
-      box-shadow: 0 0 0 8px rgba(255, 255, 255, 0);
-    }
-    100% {
-      box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
-    }
+    font-weight: 500;
+    padding-top: 10px;
   }
 `;
 
-export default MoodRadio;
+export default moodSelector;

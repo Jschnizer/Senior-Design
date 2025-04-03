@@ -15,9 +15,8 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
   // Local state for contextual inputs
   const [mood, setMood] = useState('');
   const [percentNew, setPercentNew] = useState(0.5);
-  const [maxTracks, setMaxTracks] = useState(10);
   const [genres, setGenres] = useState([]);
-  const [tempo, setTempo] = useState(50);
+  const [tempo, setTempo] = useState(100);
   const [useWeather, setUseWeather] = useState(false);
   const [minDuration, setMinDuration] = useState(1);
   const [maxDuration, setMaxDuration] = useState(30);
@@ -39,10 +38,13 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
     <div className="content">
       <h2 className="form-section-title">Tune Your Playlist</h2>
       <div className="inputs-grid">
-        {/* Mood */}
+        {/* Moods */}
         <div className="mood-row">
-          <p>Mood</p>
-          <MoodRadio mood={mood} setMood={setMood} />
+          <p style={{ marginBottom: '0.5rem' }}>Moods</p>
+          <MoodRadio
+            selectedMoods={mood}
+            setSelectedMoods={setMood}
+          />
         </div>
 
         {/* Discovery */}
@@ -61,27 +63,15 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
 
         {/* Tempo */}
         <label>
-          Tempo (BPM)
+          Average Tempo (BPM)
           <input
             type="range"
             min="1"
-            max="100"
+            max="200"
             value={tempo}
             onChange={(e) => setTempo(Number(e.target.value))}
           />
           <span className="range-value">{tempo} BPM</span>
-        </label>
-
-        {/* Max Tracks */}
-        <label>
-          Max Tracks to Display
-          <input
-            type="number"
-            min="1"
-            max="50"
-            value={maxTracks}
-            onChange={(e) => setMaxTracks(Number(e.target.value))}
-          />
         </label>
 
         {/* Use Weather Switch */}
@@ -142,7 +132,7 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
 
         {/* Let user select top artists via chips */}
         <div className="top-artists-row">
-          <h3>Select Your Top Artists</h3>
+          <h3>Select From Your Top Artists</h3>
           <TopArtistsSelector
             token={token}
             selectedArtists={selectedArtists}

@@ -109,7 +109,7 @@ def recommend():
         max_duration = float(data.get('maxDuration', 30))    # in minutes
 
         # Convert mood to a numeric code
-        mood_map = {'happy': 1, 'sad': 2, 'energetic': 3, 'relaxed': 4}
+        mood_map = {'happy': 1, 'sad': 2, 'energetic': 3, 'relaxed': 4, 'angry': 5, 'mellow': 6, 'scared': 7, 'optimistic': 8, 'romantic': 9, 'goofy': 10, 'sentimental': 11, 'lovesick': 12, 'bitter': 13}
         mood_numeric = mood_map.get(mood_str.lower(), 0)
 
         # Map weather string to a code

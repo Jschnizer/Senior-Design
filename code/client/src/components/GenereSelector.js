@@ -3,7 +3,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Checkbox from './Checkbox';
 
-const availableGenres = ["pop", "rock", "jazz", "classical", "hiphop"];
+const availableGenres = ["pop", "rock", "jazz", "classical", "hip-hop", "r&b", "country", "heavy metal", "electronic", "funk", "indie"];
 
 function GenreSelector({ selectedGenres, setSelectedGenres }) {
   const toggleGenre = (genre) => {
