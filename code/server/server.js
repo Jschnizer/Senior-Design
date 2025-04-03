@@ -179,8 +179,9 @@ app.post('/recommend', async (req, res) => {
       useWeather,       // boolean: whether to use weather info
       history,          // array of strings, e.g. ["Song A by Artist1", "Song B by Artist2", ...]
       access_token,      // Spotify access token for retrieving album covers
-      selectedArtists   // array of selected artist names
+      selectedArtistNames   // array of selected artist names
     } = req.body;
+    // console.log("Received recommendation request:", req.body);
 
     // Determine a time-of-day description.
     const currentHour = new Date().getHours();
@@ -209,7 +210,7 @@ Context:
 - Preferred Tempo: around ${tempo} BPM
 - Duration Range: ${minDuration} to ${maxDuration} minutes
 - Preferred Genres: ${genres && genres.length ? genres.join(", ") : "any"}
-- Selected Artists: ${selectedArtists && selectedArtists.length ? selectedArtists.join(", ") : "any"}
+- Selected Artists: ${selectedArtistNames && selectedArtistNames.length ? selectedArtistNames.join(", ") : "any"}
 
 For each recommended track, please provide:
 - Spotify track ID (if available; if not, leave as null)
@@ -221,14 +222,16 @@ For each recommended track, please provide:
 Return the output in valid JSON format with no markdown formatting as an array of objects with the keys "id", "name", "artist", "albumCover", and "score".
     `;
 
+    console.log("Prompt for ChatGPT:", prompt);
+
     // Call ChatGPT.
     const chatResponse = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "o3-mini", // IF YOU ARE TESTING PLESAE USE "gpt-4o-mini" HERE INSTEAD AND UNCOMMENT THE TEMPERATURE LINE BELOW
       messages: [
         { role: "system", content: "You are a helpful music recommendation assistant." },
         { role: "user", content: prompt }
       ],
-      temperature: 0.7,
+      // temperature: 0.7,
     });
 
     let reply = chatResponse.choices[0].message.content.trim();

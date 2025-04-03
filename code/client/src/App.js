@@ -141,7 +141,7 @@ function App() {
       return;
     }
     setLoading(true);
-    const artistNames = selectedArtists.map(artist => artist.name);
+    const selectedArtistNames = selectedArtists.map(artist => artist.name);
     const currentWeather = weatherData?.weather[0]?.description || '';
     const history = userData && userData.items
       ? userData.items.map(track => `${track.name} by ${track.artists[0].name}`)
@@ -157,7 +157,7 @@ function App() {
       useWeather,
       history,
       access_token: token,
-      artistNames,
+      selectedArtistNames,
     };
     console.log('Recommendation payload:', payload);
     axios.post('http://localhost:5000/recommend', payload)
