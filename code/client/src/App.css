@@ -299,6 +299,8 @@ footer {
   border-radius: 10px;
   background-color: rgb(18, 18, 18);
   overflow-y: auto;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .swipe-container {
@@ -356,6 +358,7 @@ footer {
   border-bottom: 1px solid #ccc;
   height: 60px;
   position: relative;
+  touch-action: none;
 }
 
 .drag-handle {
@@ -364,6 +367,7 @@ footer {
   padding: 5px 10px;
   color: white;
   user-select: none;
+  touch-action: none;
 }
 
 .drag-handle:active {
