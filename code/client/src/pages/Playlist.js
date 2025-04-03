@@ -16,8 +16,7 @@ import {
   useSensors,
   PointerSensor,
   KeyboardSensor,
-  MouseSensor,
-  TouchSensor
+  DragOverlay
 } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -26,6 +25,7 @@ import {
   useSortable
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { restrictToWindowEdges } from '@dnd-kit/modifiers';
 import axios from 'axios';
 import styled from 'styled-components';
 
@@ -154,6 +154,8 @@ function Playlist({ token, recommendations, setRecommendations, playlist, setPla
   const [discarded, setDiscarded] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [playlistName, setPlaylistName] = useState("");
+  const [activeId, setActiveId] = useState(null);
+  const [activeTrack, setActiveTrack] = useState(null);
 
   // States for success and error modals
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -176,6 +178,55 @@ function Playlist({ token, recommendations, setRecommendations, playlist, setPla
     setPlaylist((prev) => prev.filter((t) => t.id !== track.id));
     setDiscarded((prev) => prev.filter((t) => t.id !== track.id));
   };
+
+  const handleDragStart = (event) => {
+    const { active } = event;
+    setActiveId(active.id);
+    const track = recommendations.find(t => t.id === active.id);
+    setActiveTrack(track);
+
+    // Highlight drop zones
+    document.querySelectorAll('.discard-list, .playlist-list').forEach(el => {
+      el.classList.add('dnd-active');
+    });
+  };
+
+  const handleDragEndGlobal = (event) => {
+    const { over } = event;
+
+    // Remove highlight from drop zones
+    document.querySelectorAll('.discard-list, .playlist-list').forEach(el => {
+      el.classList.remove('dnd-active');
+    });
+
+
+    if (!over || !activeTrack) return;
+
+    if (over.id === 'playlist-dropzone') {
+      handleAddToPlaylist(activeTrack);
+    } else if (over.id === 'discard-dropzone') {
+      handleDiscard(activeTrack);
+    }
+
+    setActiveId(null);
+
+    setActiveTrack(null);
+  };
+
+  const handleDragOver = (event) => {
+    const { over } = event;
+    document.querySelectorAll('.discard-list, .playlist-list').forEach(el => {
+      el.classList.remove('dnd-highlight');
+    });
+
+    if (over) {
+      const dropZone = document.getElementById(over.id);
+      if (dropZone) {
+        dropZone.classList.add('dnd-highlight');
+      }
+    }
+  };
+
 
   // Function to export current playlist to Spotify
   const exportToSpotify = async (name) => {
@@ -240,6 +291,11 @@ function Playlist({ token, recommendations, setRecommendations, playlist, setPla
     document.querySelectorAll('.track-item').forEach(item => {
       item.style.transform = 'translate3d(0px, 0px, 0px)';
     });
+    document.querySelectorAll('.discard-list, .playlist-list').forEach(el => {
+      el.classList.remove('dnd-active', 'dnd-highlight');
+    });
+    setActiveId(null);
+    setActiveTrack(null);
   };
 
   if (loading) {
@@ -252,86 +308,106 @@ function Playlist({ token, recommendations, setRecommendations, playlist, setPla
 
   return (
     <div className="content">
-      <div className="playlist-container">
-        {/* Left Side: Discarded Songs */}
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={(event) => handleDragEnd(event, discarded, setDiscarded)}
-          onDragCancel={handleDragCancel}
-        >
-          <SortableContext items={discarded.map((track) => track.id)}>
-            <div className="discard-list">
-              <h3>Discarded Songs</h3>
-              {discarded.length > 0 ? (
-                discarded.map((track, index) => (
-                  <SortableTrack
-                    key={track.id}
-                    track={track}
-                    index={index}
-                    isDiscarded={true}
-                    onReshuffle={handleReshuffle}
-                  />
-                ))
-              ) : (
-                <p>No discarded songs yet.</p>
-              )}
-            </div>
-          </SortableContext>
-        </DndContext>
+      {/* Main DndContext for swipe card dragging */}
+      <DndContext
+        sensors={sensors}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEndGlobal}
+        onDragOver={handleDragOver}
+        onDragCancel={handleDragCancel}
+        modifiers={[restrictToWindowEdges]}
+      >
+        <div className="playlist-container">
+          {/* Left Side: Discarded Songs Drop Zone */}
+          <div id="discard-dropzone" className="discard-list">
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={(event) => handleDragEnd(event, discarded, setDiscarded)}
+              onDragCancel={handleDragCancel}
+            >
+              <SortableContext items={discarded.map((track) => track.id)}>
+                <h3>Discarded Songs</h3>
+                {discarded.length > 0 ? (
+                  discarded.map((track, index) => (
+                    <SortableTrack
+                      key={track.id}
+                      track={track}
+                      index={index}
+                      isDiscarded={true}
+                      onReshuffle={handleReshuffle}
+                    />
+                  ))
+                ) : (
+                  <p>No discarded songs yet.</p>
+                )}
+              </SortableContext>
+            </DndContext>
+          </div>
 
-        {/* Center: Swipe Card */}
-        <div className="swipe-container">
-          <h2>Swipe Songs</h2>
-          {recommendations.length > 0 ? (
-            <div className="swipe-card-wrapper">
-              <SwipeableCard track={recommendations[0]} />
-              <div className="button-group">
-                <MinusButton onClick={() => handleDiscard(recommendations[0])} />
-                <PlusButton onClick={() => handleAddToPlaylist(recommendations[0])} />
+          {/* Center: Swipe Card */}
+          <div className="swipe-container">
+            <h2>Swipe Songs</h2>
+            {recommendations.length > 0 ? (
+              <div className="swipe-card-wrapper">
+                <SwipeableCard track={recommendations[0]} />
+                <div className="button-group">
+                  <MinusButton onClick={() => handleDiscard(recommendations[0])} />
+                  <PlusButton onClick={() => handleAddToPlaylist(recommendations[0])} />
+                </div>
+                <div style={{ marginTop: '700px', position: 'absolute' }}>
+                  <ExportButton onClick={() => setShowModal(true)} />
+                </div>
               </div>
-
-              {/* Export Button directly under plus/minus buttons */}
-              <div style={{ marginTop: '700px', position: 'absolute' }}>
+            ) : (
+              <div style={{ marginTop: '300px', position: 'absolute' }}>
                 <ExportButton onClick={() => setShowModal(true)} />
               </div>
-            </div>
-          ) : (
-            <div
-              style={{ marginTop: '300px', position: 'absolute' }}>
-              <ExportButton onClick={() => setShowModal(true)} />
-            </div>
+            )}
+          </div>
 
-          )}
+          {/* Right Side: Playlist Drop Zone */}
+          <div id="playlist-dropzone" className="playlist-list">
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={(event) => handleDragEnd(event, playlist, setPlaylist)}
+              onDragCancel={handleDragCancel}
+            >
+              <SortableContext items={playlist.map((track) => track.id)}>
+                <h3>Playlist</h3>
+                {playlist.length > 0 ? (
+                  playlist.map((track, index) => (
+                    <SortableTrack
+                      key={track.id}
+                      track={track}
+                      index={index}
+                      isInPlaylist={true}
+                      onReshuffle={handleReshuffle}
+                    />
+                  ))
+                ) : (
+                  <p>Your playlist is empty.</p>
+                )}
+              </SortableContext>
+            </DndContext>
+          </div>
+
+          {/* Drag Overlay */}
+          <DragOverlay>
+            {activeId ? (
+              <div style={{
+                transform: 'scale(1.05)',
+                opacity: 0.8,
+                boxShadow: '0 0 20px rgba(0,0,0,0.3)',
+                zIndex: 1000
+              }}>
+                <SwipeableCard track={activeTrack} />
+              </div>
+            ) : null}
+          </DragOverlay>
         </div>
-
-        {/* Right Side: Playlist */}
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={(event) => handleDragEnd(event, playlist, setPlaylist)}
-          onDragCancel={handleDragCancel}
-        >
-          <SortableContext items={playlist.map((track) => track.id)}>
-            <div className="playlist-list">
-              <h3>Playlist</h3>
-              {playlist.length > 0 ? (
-                playlist.map((track, index) => (
-                  <SortableTrack
-                    key={track.id}
-                    track={track}
-                    index={index}
-                    isInPlaylist={true}
-                    onReshuffle={handleReshuffle}
-                  />
-                ))
-              ) : (
-                <p>Your playlist is empty.</p>
-              )}
-            </div>
-          </SortableContext>
-        </DndContext>
-      </div>
+      </DndContext>
 
       {/* Modal for Naming Playlist */}
       {showModal && (

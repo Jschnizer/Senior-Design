@@ -46,13 +46,13 @@ app.get('/login', (req, res) => {
   const scopes = 'user-read-private user-read-email user-top-read playlist-modify-public';
   res.redirect(
     'https://accounts.spotify.com/authorize?' +
-      new URLSearchParams({
-        response_type: 'code',
-        client_id: process.env.SPOTIFY_CLIENT_ID,
-        scope: scopes,
-        redirect_uri: process.env.REDIRECT_URI,
-        state: generateRandomString(16),
-      })
+    new URLSearchParams({
+      response_type: 'code',
+      client_id: process.env.SPOTIFY_CLIENT_ID,
+      scope: scopes,
+      redirect_uri: process.env.REDIRECT_URI,
+      state: generateRandomString(16),
+    })
   );
 });
 
@@ -118,8 +118,8 @@ app.get('/callback', (req, res) => {
         'Basic ' +
         Buffer.from(
           process.env.SPOTIFY_CLIENT_ID +
-            ':' +
-            process.env.SPOTIFY_CLIENT_SECRET
+          ':' +
+          process.env.SPOTIFY_CLIENT_SECRET
         ).toString('base64'),
       'Content-Type': 'application/x-www-form-urlencoded',
     },
@@ -135,10 +135,10 @@ app.get('/callback', (req, res) => {
       // Redirect to front-end with tokens
       res.redirect(
         'http://localhost:3000/?' +
-          new URLSearchParams({
-            access_token,
-            refresh_token,
-          })
+        new URLSearchParams({
+          access_token,
+          refresh_token,
+        })
       );
     })
     .catch((error) => {
@@ -187,8 +187,8 @@ app.post('/recommend', async (req, res) => {
     const currentHour = new Date().getHours();
     const timeOfDay =
       currentHour < 12 ? "morning" :
-      currentHour < 18 ? "afternoon" :
-      currentHour < 21 ? "evening" : "night";
+        currentHour < 18 ? "afternoon" :
+          currentHour < 21 ? "evening" : "night";
 
     // Build history text (if provided)
     let historyText = '';
@@ -226,12 +226,12 @@ Return the output in valid JSON format with no markdown formatting as an array o
 
     // Call ChatGPT.
     const chatResponse = await openai.chat.completions.create({
-      model: "o3-mini", // IF YOU ARE TESTING PLESAE USE "gpt-4o-mini" HERE INSTEAD AND UNCOMMENT THE TEMPERATURE LINE BELOW
+      model: "gpt-4o-mini", // IF YOU ARE TESTING PLESAE USE "gpt-4o-mini" HERE INSTEAD AND UNCOMMENT THE TEMPERATURE LINE BELOW
       messages: [
         { role: "system", content: "You are a helpful music recommendation assistant." },
         { role: "user", content: prompt }
       ],
-      // temperature: 0.7,
+      temperature: 0.7,
     });
 
     let reply = chatResponse.choices[0].message.content.trim();
@@ -240,7 +240,7 @@ Return the output in valid JSON format with no markdown formatting as an array o
     if (reply.startsWith("```")) {
       reply = reply.split('\n').slice(1, -1).join('\n').trim();
     }
-    
+
     let recommendations = JSON.parse(reply);
 
     // Validate each recommendation and fetch album cover

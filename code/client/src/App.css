@@ -421,3 +421,44 @@ footer {
   font-size: 18px;
   color: rgb(255, 255, 255);
 }
+
+/* Drop zone highlighting */
+.discard-list.dnd-active {
+  background-color: rgba(255, 0, 0, 0.05);
+  border: 2px dashed rgba(255, 0, 0, 0.3);
+}
+
+.playlist-list.dnd-active {
+  background-color: rgba(0, 255, 0, 0.05);
+  border: 2px dashed rgba(0, 255, 0, 0.3);
+}
+
+.discard-list.dnd-highlight {
+  background-color: rgba(255, 0, 0, 0.1);
+  border: 2px dashed rgba(255, 0, 0, 0.8);
+}
+
+.playlist-list.dnd-highlight {
+  background-color: rgba(0, 255, 0, 0.1);
+  border: 2px dashed rgba(0, 255, 0, 0.8);
+}
+
+/* Drag handle styling */
+.drag-handle {
+  cursor: grab;
+  touch-action: none;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+/* Swipe card styling */
+.swipe-card {
+  cursor: grab;
+  transition: transform 0.1s ease;
+}
+
+.swipe-card:active {
+  cursor: grabbing;
+}

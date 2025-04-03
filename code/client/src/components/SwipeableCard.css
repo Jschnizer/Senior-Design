@@ -18,8 +18,8 @@
 
 .swipeable-card img {
   width: 100%;
-  height: auto;
-  pointer-events: none; /* Prevent image click propagation */
+  pointer-events: none;
+  /* Prevent image click propagation */
   border-radius: 10px;
 }
 
