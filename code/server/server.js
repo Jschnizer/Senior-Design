@@ -226,12 +226,12 @@ Return the output in valid JSON format with no markdown formatting as an array o
 
     // Call ChatGPT.
     const chatResponse = await openai.chat.completions.create({
-      model: "gpt-4o-mini", // IF YOU ARE TESTING PLESAE USE "gpt-4o-mini" HERE INSTEAD AND UNCOMMENT THE TEMPERATURE LINE BELOW
+      model: "o3-mini", // IF YOU ARE TESTING PLESAE USE "gpt-4o-mini" HERE INSTEAD AND UNCOMMENT THE TEMPERATURE LINE BELOW
       messages: [
         { role: "system", content: "You are a helpful music recommendation assistant." },
         { role: "user", content: prompt }
       ],
-      temperature: 0.7,
+      //temperature: 0.7,
     });
 
     let reply = chatResponse.choices[0].message.content.trim();
