@@ -136,6 +136,12 @@ footer {
   border-color: rgba(0, 255, 204, 0.5);
 }
 
+/* Style for disabled elements */
+.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
 .top-artists-row {
   grid-column: 1 / 4;
   /* from column 1 to column 4 (since we have 3 columns, end is exclusive) */
@@ -181,6 +187,19 @@ footer {
   align-items: center;
   gap: 0.5rem;
   margin: 0.5rem 0;
+}
+
+.checkbox-row {
+  grid-column: 1 / 4;
+  /* spans all columns if you have 3 columns in .inputs-grid */
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.2rem;
+  color: #fff;
 }
 
 /* Range slider value display */

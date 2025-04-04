@@ -1,4 +1,3 @@
-// Home.js
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../App.css';
@@ -22,6 +21,16 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
   const [maxDuration, setMaxDuration] = useState(30);
   const [selectedArtists, setSelectedArtists] = useState([]);
 
+  // State for checkboxes to enable/disable inputs
+  const [enabledInputs, setEnabledInputs] = useState({
+    mood: true,
+    discovery: true,
+    genres: true,
+    tempo: true,
+    duration: true,
+    artists: true,
+  });
+
   // When the weather toggle is enabled, automatically fetch weather data.
   useEffect(() => {
     if (useWeather && !weatherData) {
@@ -29,26 +38,55 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
     }
   }, [useWeather]);
 
+  const handleCheckboxChange = (inputName) => {
+    setEnabledInputs((prev) => ({
+      ...prev,
+      [inputName]: !prev[inputName],
+    }));
+  };
+
   const handleGeneratePlaylist = () => {
-    fetchRecommendations(mood, percentNew, genres, tempo, minDuration, maxDuration, useWeather, selectedArtists);
+    fetchRecommendations(
+      enabledInputs.mood ? mood : null,
+      enabledInputs.discovery ? percentNew : null,
+      enabledInputs.genres ? genres : null,
+      enabledInputs.tempo ? tempo : null,
+      enabledInputs.duration ? minDuration : null,
+      enabledInputs.duration ? maxDuration : null,
+      useWeather,
+      enabledInputs.artists ? selectedArtists : null
+    );
     navigate('/playlist');
   };
 
   return (
     <div className="content">
       <h2 className="form-section-title">Tune Your Playlist</h2>
+
+      {/* Toggle Checkboxes Section */}
+      <div className="checkbox-row">
+        {Object.keys(enabledInputs).map((key) => (
+          <label key={key} className="checkbox-label">
+            <input
+              type="checkbox"
+              checked={enabledInputs[key]}
+              onChange={() => handleCheckboxChange(key)}
+            />
+            {key.charAt(0).toUpperCase() + key.slice(1)}
+          </label>
+        ))}
+      </div>
+
       <div className="inputs-grid">
-        {/* Moods */}
-        <div className="mood-row">
-          <p style={{ marginBottom: '0.5rem' }}>Moods</p>
-          <MoodRadio
-            selectedMoods={mood}
-            setSelectedMoods={setMood}
-          />
+
+        {/* Mood Selector */}
+        <div className={`mood-row ${!enabledInputs.mood ? 'disabled' : ''}`}>
+          <p>Moods</p>
+          <MoodRadio selectedMoods={mood} setSelectedMoods={setMood} disabled={!enabledInputs.mood} />
         </div>
 
         {/* Discovery */}
-        <label>
+        <label className={!enabledInputs.discovery ? 'disabled' : ''}>
           Discovery (% New Songs)
           <input
             type="range"
@@ -57,12 +95,13 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
             step="0.01"
             value={percentNew}
             onChange={(e) => setPercentNew(Number(e.target.value))}
+            disabled={!enabledInputs.discovery}
           />
           <span className="range-value">{Math.round(percentNew * 100)}%</span>
         </label>
 
         {/* Tempo */}
-        <label>
+        <label className={!enabledInputs.tempo ? 'disabled' : ''}>
           Average Tempo (BPM)
           <input
             type="range"
@@ -70,6 +109,7 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
             max="200"
             value={tempo}
             onChange={(e) => setTempo(Number(e.target.value))}
+            disabled={!enabledInputs.tempo}
           />
           <span className="range-value">{tempo} BPM</span>
         </label>
@@ -81,14 +121,12 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
           </p>
           <WeatherSwitch
             checked={useWeather}
-            onChange={(e) => {
-              setUseWeather(e.target.checked);
-            }}
+            onChange={(e) => setUseWeather(e.target.checked)}
           />
         </div>
 
-        {/* Minimum Duration */}
-        <label>
+        {/* Minimum and Maximum Duration */}
+        <label className={!enabledInputs.duration ? 'disabled' : ''}>
           Min Duration (Minutes)
           <input
             type="number"
@@ -96,11 +134,11 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
             max="10"
             value={minDuration}
             onChange={(e) => setMinDuration(Number(e.target.value))}
+            disabled={!enabledInputs.duration}
           />
         </label>
 
-        {/* Maximum Duration */}
-        <label>
+        <label className={!enabledInputs.duration ? 'disabled' : ''}>
           Max Duration (Minutes)
           <input
             type="number"
@@ -108,10 +146,11 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
             max="30"
             value={maxDuration}
             onChange={(e) => setMaxDuration(Number(e.target.value))}
+            disabled={!enabledInputs.duration}
           />
         </label>
 
-        {/* If weather is enabled, show the weather card above genres */}
+        {/* Weather Card */}
         {useWeather && weatherData && (
           <div className="weather-card-row" style={{ gridColumn: '1 / 4', display: 'flex', justifyContent: 'center', margin: '1rem 0' }}>
             <WeatherCard
@@ -121,34 +160,18 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
           </div>
         )}
 
-        {/* Genres */}
-        <div className="genres-row">
-          <p style={{ marginBottom: '0.5rem' }}>Genres</p>
-          <GenreSelector
-            selectedGenres={genres}
-            setSelectedGenres={setGenres}
-          />
+        {/* Genre Selector */}
+        <div className={`genres-row ${!enabledInputs.genres ? 'disabled' : ''}`}>
+          <p>Genres</p>
+          <GenreSelector selectedGenres={genres} setSelectedGenres={setGenres} disabled={!enabledInputs.genres} />
         </div>
 
-        {/* Let user select top artists via chips */}
-        <div className="top-artists-row">
+        {/* Top Artists Selector */}
+        <div className={`top-artists-row ${!enabledInputs.artists ? 'disabled' : ''}`}>
           <h3>Select From Your Top Artists</h3>
-          <TopArtistsSelector
-            token={token}
-            selectedArtists={selectedArtists}
-            setSelectedArtists={setSelectedArtists}
-          />
+          <TopArtistsSelector token={token} selectedArtists={selectedArtists} setSelectedArtists={setSelectedArtists} disabled={!enabledInputs.artists} />
         </div>
       </div>
-
-      {/* {weatherData && (
-        <div className="weather-data">
-          <h2>Current Weather</h2>
-          <p>Location: {weatherData.name}</p>
-          <p>Temperature: {weatherData.main.temp} °F</p>
-          <p>Weather: {weatherData.weather[0]?.description}</p>
-        </div>
-      )} */}
 
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: '2rem' }}>
         <GenerateButton onClick={handleGeneratePlaylist} />
