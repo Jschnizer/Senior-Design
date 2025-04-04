@@ -16,7 +16,8 @@ import {
   useSensors,
   PointerSensor,
   KeyboardSensor,
-  DragOverlay
+  DragOverlay,
+  useDroppable,
 } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -73,6 +74,34 @@ function SortableTrack({ track, index, isDiscarded, isInPlaylist, onReshuffle })
     </div>
   );
 }
+
+// Drop Zone Components
+const DiscardDropZone = ({ children }) => {
+  const { setNodeRef, isOver } = useDroppable({
+    id: 'discard-dropzone',
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      className="discard-list"
+    >
+      {children}
+    </div>
+  );
+};
+
+const PlaylistDropZone = ({ children }) => {
+  const { setNodeRef } = useDroppable({
+    id: 'playlist-dropzone',
+  });
+
+  return (
+    <div ref={setNodeRef} className="playlist-list">
+      {children}
+    </div>
+  );
+};
 
 // Styled Components for Modal
 const ModalOverlay = styled.div`
@@ -192,24 +221,45 @@ function Playlist({ token, recommendations, setRecommendations, playlist, setPla
   };
 
   const handleDragEndGlobal = (event) => {
-    const { over } = event;
+    const { over, active } = event;
 
     // Remove highlight from drop zones
     document.querySelectorAll('.discard-list, .playlist-list').forEach(el => {
-      el.classList.remove('dnd-active');
+      el.classList.remove('dnd-active', 'dnd-highlight');
     });
 
+    if (!activeTrack) {
+      setActiveId(null);
+      return;
+    }
 
-    if (!over || !activeTrack) return;
+    // Get the viewport width
+    const viewportWidth = window.innerWidth;
 
-    if (over.id === 'playlist-dropzone') {
-      handleAddToPlaylist(activeTrack);
-    } else if (over.id === 'discard-dropzone') {
+    // Get the final position of the dragged item
+    const finalPosition = active.rect.current.translated?.left || 0;
+
+    // Calculate the drop zones
+    const leftThreshold = viewportWidth * 0.25;
+    const rightThreshold = viewportWidth * 0.75;
+
+    // Check where the item was dropped
+    if (finalPosition < leftThreshold) {
+      // Left 25% - discard
       handleDiscard(activeTrack);
+    } else if (finalPosition > rightThreshold) {
+      // Right 25% - add to playlist
+      handleAddToPlaylist(activeTrack);
+    } else if (over && ['discard-dropzone', 'playlist-dropzone'].includes(over.id)) {
+      // If dropped on explicit drop zones
+      if (over.id === 'playlist-dropzone') {
+        handleAddToPlaylist(activeTrack);
+      } else if (over.id === 'discard-dropzone') {
+        handleDiscard(activeTrack);
+      }
     }
 
     setActiveId(null);
-
     setActiveTrack(null);
   };
 
@@ -219,7 +269,7 @@ function Playlist({ token, recommendations, setRecommendations, playlist, setPla
       el.classList.remove('dnd-highlight');
     });
 
-    if (over) {
+    if (over && ['discard-dropzone', 'playlist-dropzone'].includes(over.id)) {
       const dropZone = document.getElementById(over.id);
       if (dropZone) {
         dropZone.classList.add('dnd-highlight');
@@ -258,7 +308,7 @@ function Playlist({ token, recommendations, setRecommendations, playlist, setPla
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 1, // Reduce the distance to make dragging easier
+        distance: 5, // Reduce the distance to make dragging easier
       },
     }),
     useSensor(KeyboardSensor, {
@@ -319,7 +369,7 @@ function Playlist({ token, recommendations, setRecommendations, playlist, setPla
       >
         <div className="playlist-container">
           {/* Left Side: Discarded Songs Drop Zone */}
-          <div id="discard-dropzone" className="discard-list">
+          <DiscardDropZone>
             <DndContext
               sensors={sensors}
               collisionDetection={closestCenter}
@@ -343,7 +393,7 @@ function Playlist({ token, recommendations, setRecommendations, playlist, setPla
                 )}
               </SortableContext>
             </DndContext>
-          </div>
+          </DiscardDropZone>
 
           {/* Center: Swipe Card */}
           <div className="swipe-container">
@@ -367,7 +417,7 @@ function Playlist({ token, recommendations, setRecommendations, playlist, setPla
           </div>
 
           {/* Right Side: Playlist Drop Zone */}
-          <div id="playlist-dropzone" className="playlist-list">
+          <PlaylistDropZone>
             <DndContext
               sensors={sensors}
               collisionDetection={closestCenter}
@@ -391,7 +441,7 @@ function Playlist({ token, recommendations, setRecommendations, playlist, setPla
                 )}
               </SortableContext>
             </DndContext>
-          </div>
+          </PlaylistDropZone>
 
           {/* Drag Overlay */}
           <DragOverlay>
