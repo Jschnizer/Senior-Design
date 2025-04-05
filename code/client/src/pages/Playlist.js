@@ -8,6 +8,7 @@ import Confirm from '../components/Confirm';
 import Button from '../components/Button';
 import PlusButton from '../components/PlusButton';
 import MinusButton from '../components/MinusButton';
+import GenerateButton from '../components/GenerateButton';
 import '../App.css';
 import {
   DndContext,
@@ -179,7 +180,7 @@ const ErrorMessageText = styled.p`
   font-family: 'Arial', sans-serif;
 `;
 
-function Playlist({ token, recommendations, setRecommendations, playlist, setPlaylist, loading }) {
+function Playlist({ token, recommendations, setRecommendations, playlist, setPlaylist, loading, fetchRecommendations, lastRequestParams }) {
   const [discarded, setDiscarded] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [playlistName, setPlaylistName] = useState("");
@@ -355,6 +356,25 @@ function Playlist({ token, recommendations, setRecommendations, playlist, setPla
       </div>
     );
   }
+  
+  // Handler for requesting more recommendations using the same parameters
+  const handleGetMoreRecommendations = () => {
+    console.log("Requesting more recommendations...");
+    if (fetchRecommendations && lastRequestParams) {
+      console.log("Fetching more recommendations with the same parameters...");
+      fetchRecommendations(
+        lastRequestParams.mood,
+        lastRequestParams.percentNew,
+        lastRequestParams.genres,
+        lastRequestParams.tempo,
+        lastRequestParams.minDuration,
+        lastRequestParams.maxDuration,
+        lastRequestParams.useWeather,
+        lastRequestParams.selectedArtists,
+        false // Don't clear previous recommendations
+      );
+    }
+  };
 
   return (
     <div className="content">
@@ -405,13 +425,17 @@ function Playlist({ token, recommendations, setRecommendations, playlist, setPla
                   <MinusButton onClick={() => handleDiscard(recommendations[0])} />
                   <PlusButton onClick={() => handleAddToPlaylist(recommendations[0])} />
                 </div>
-                <div style={{ marginTop: '700px', position: 'absolute' }}>
-                  <ExportButton onClick={() => setShowModal(true)} />
+                {/* Instead of absolutely positioning, we let the button be in the flow */}
+                <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+                  <GenerateButton onClick={handleGetMoreRecommendations} text="Get More Recommendations" />
                 </div>
               </div>
             ) : (
-              <div style={{ marginTop: '300px', position: 'absolute' }}>
+              <div style={{ marginTop: '2rem', textAlign: 'center' }}>
                 <ExportButton onClick={() => setShowModal(true)} />
+                <div style={{ marginTop: '1rem' }}>
+                  <GenerateButton onClick={handleGetMoreRecommendations} text="Get More Recommendations" />
+                </div>
               </div>
             )}
           </div>

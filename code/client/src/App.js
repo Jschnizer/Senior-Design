@@ -15,6 +15,7 @@ function App() {
   const [weatherData, setWeatherData] = useState(null);
   const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [lastRequestParams, setLastRequestParams] = useState(null);
 
   // Retrieve token and refresh token from URL or localStorage on mount
   useEffect(() => {
@@ -135,17 +136,30 @@ function App() {
     );
   };
 
-  const fetchRecommendations = (mood, percentNew, genres, tempo, minDuration, maxDuration, useWeather, selectedArtists) => {
+  const fetchRecommendations = (mood, percentNew, genres, tempo, minDuration, maxDuration, useWeather, selectedArtists, clearPrev) => {
     if (!token) {
       alert('Please log in first!');
       return;
     }
+
     setLoading(true);
-    const selectedArtistNames = selectedArtists?.map(artist => artist.name);
+
+    // Clear previous recommendations if specified
+    if (clearPrev) {
+      localStorage.removeItem('recommendations');
+      console.log('Cleared previous recommendations');
+    }
+
     const currentWeather = weatherData?.weather[0]?.description || '';
     const history = userData && userData.items
       ? userData.items.map(track => `${track.name} by ${track.artists[0].name}`)
       : [];
+
+    let recommendations = JSON.parse(localStorage.getItem('recommendations')) || [];
+    console.log('Recommendations:', recommendations);
+    let previousRecommendations = recommendations.map(rec => rec.id);
+    console.log('Previous Recommendations:', previousRecommendations);
+
     const payload = {
       mood,
       percentNew,
@@ -157,12 +171,16 @@ function App() {
       useWeather,
       history,
       access_token: token,
-      selectedArtistNames,
+      selectedArtists,
+      previousRecommendations,
     };
     console.log('Recommendation payload:', payload);
+    setLastRequestParams(payload); // Save the parameters
+    console.log('Last Request Params:', lastRequestParams);
     axios.post('http://localhost:5000/recommend', payload)
       .then(response => {
         setRecommendations(response.data.recommendations);
+        localStorage.setItem('recommendations', JSON.stringify(response.data.recommendations));
         setLoading(false);
       })
       .catch(error => {
@@ -170,7 +188,7 @@ function App() {
         alert('Failed to fetch recommendations.');
         setLoading(false);
       });
-  };  
+  };
 
   // If no token exists, show the login page
   if (!token) {
@@ -219,6 +237,8 @@ function App() {
                 playlist={playlist}
                 setPlaylist={setPlaylist}
                 loading={loading}
+                fetchRecommendations={fetchRecommendations}
+                lastRequestParams={lastRequestParams}
               />
             }
           />

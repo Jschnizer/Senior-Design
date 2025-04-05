@@ -166,6 +166,25 @@ app.get('/me', (req, res) => {
     });
 });
 
+// Route to fetch user's name from Spotify
+app.get('/user', (req, res) => {
+  const access_token = req.query.access_token;
+
+  axios
+    .get('https://api.spotify.com/v1/me', {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    })
+    .then((response) => {
+      res.json(response.data);
+    })
+    .catch(err => {
+      console.error("Error fetching user data from Spotify:", err.response?.data || err.message);
+      res.status(500).json({ error: "Error fetching user data" });
+    });
+});
+
 app.post('/recommend', async (req, res) => {
   try {
     const {
@@ -179,9 +198,13 @@ app.post('/recommend', async (req, res) => {
       useWeather,       // boolean: whether to use weather info
       history,          // array of strings, e.g. ["Song A by Artist1", "Song B by Artist2", ...]
       access_token,      // Spotify access token for retrieving album covers
-      selectedArtistNames   // array of selected artist names
+      selectedArtists,   // array of selected artist names
+      previousRecommendations, // array of previously recommended track IDs
     } = req.body;
     // console.log("Received recommendation request:", req.body);
+
+    const selectedArtistNames = selectedArtists?.map(artist => artist.name);
+    console.log("Selected artists:", selectedArtistNames);
 
     // Determine a time-of-day description.
     const currentHour = new Date().getHours();
@@ -201,6 +224,8 @@ app.post('/recommend', async (req, res) => {
 You are a music recommendation assistant. Based on the contextual information and the user's listening history provided below, please generate a ranked list of 25 Spotify track recommendations that blend familiar tracks with new discoveries. The blend should be controlled by the "percentNew" value, where 0.0 means all recommendations should be similar to the user's current tastes, and 1.0 means all recommendations should be new and experimental. Only return songs that you are sure exist on Spotify and include their valid Spotify track IDs if available. Also be sure to include at least one song from each of the selected artists if provided.
 
 ${historyText}
+
+Here is a list of previously recommended tracks (IDs only). Do not recommend any of these tracks: ${previousRecommendations && previousRecommendations.length ? previousRecommendations.join(", ") : "none"}.
 
 Context:
 - Mood: ${mood}
@@ -231,7 +256,7 @@ Return the output in valid JSON format with no markdown formatting as an array o
         { role: "system", content: "You are a helpful music recommendation assistant." },
         { role: "user", content: prompt }
       ],
-      //temperature: 0.7,
+      // temperature: 0.7,
     });
 
     let reply = chatResponse.choices[0].message.content.trim();
@@ -242,6 +267,11 @@ Return the output in valid JSON format with no markdown formatting as an array o
     }
 
     let recommendations = JSON.parse(reply);
+
+    // Remove any recommendations that are in the previous recommendations list
+    if (previousRecommendations && previousRecommendations.length) {
+      recommendations = recommendations.filter(rec => !previousRecommendations.includes(rec.id));
+    }
 
     // Validate each recommendation and fetch album cover
     if (access_token) {
@@ -257,7 +287,6 @@ Return the output in valid JSON format with no markdown formatting as an array o
         albumCover: rec.albumCover || 'https://via.placeholder.com/150'
       }));
     }
-
     res.json({ recommendations });
   } catch (error) {
     console.error("Error in /recommend endpoint:", error);

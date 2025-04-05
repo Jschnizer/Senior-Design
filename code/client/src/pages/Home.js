@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import '../App.css';
 import GenerateButton from '../components/GenerateButton';
 import WeatherSwitch from '../components/WeatherSwitch';
@@ -20,6 +21,7 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
   const [minDuration, setMinDuration] = useState(1);
   const [maxDuration, setMaxDuration] = useState(30);
   const [selectedArtists, setSelectedArtists] = useState([]);
+  const [userName, setUserName] = useState('');
 
   // State for checkboxes to enable/disable inputs
   const [enabledInputs, setEnabledInputs] = useState({
@@ -30,6 +32,19 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
     duration: true,
     artists: true,
   });
+
+  // Fetch the user's name when the token is available
+  useEffect(() => {
+    if (token) {
+      axios.get('http://localhost:5000/user', { params: { access_token: token } })
+        .then((response) => {
+          setUserName(response.data.display_name);
+        })
+        .catch((error) => {
+          console.error('Error fetching user name:', error);
+        });
+    }
+  }, [token]);
 
   // When the weather toggle is enabled, automatically fetch weather data.
   useEffect(() => {
@@ -54,13 +69,16 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
       enabledInputs.duration ? minDuration : null,
       enabledInputs.duration ? maxDuration : null,
       useWeather,
-      enabledInputs.artists ? selectedArtists : null
+      enabledInputs.artists ? selectedArtists : null,
+      true // clear previous recommendations
     );
     navigate('/playlist');
   };
 
   return (
     <div className="content">
+      <h1 className="main-title">Welcome to SoundScape, {userName}</h1>
+      {/* <img src="/wave.png" alt="Wave" /> */}
       <h2 className="form-section-title">Tune Your Playlist</h2>
 
       {/* Toggle Checkboxes Section */}
@@ -174,7 +192,7 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: '2rem' }}>
-        <GenerateButton onClick={handleGeneratePlaylist} />
+        <GenerateButton onClick={handleGeneratePlaylist} text={"Genertate Playlist"} />
       </div>
     </div>
   );
