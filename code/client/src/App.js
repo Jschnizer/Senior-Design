@@ -147,7 +147,6 @@ function App() {
     // Clear previous recommendations if specified
     if (clearPrev) {
       localStorage.removeItem('recommendations');
-      console.log('Cleared previous recommendations');
     }
 
     const currentWeather = weatherData?.weather[0]?.description || '';
@@ -156,9 +155,7 @@ function App() {
       : [];
 
     let recommendations = JSON.parse(localStorage.getItem('recommendations')) || [];
-    console.log('Recommendations:', recommendations);
     let previousRecommendations = recommendations.map(rec => rec.id);
-    console.log('Previous Recommendations:', previousRecommendations);
 
     const payload = {
       mood,
@@ -174,9 +171,9 @@ function App() {
       selectedArtists,
       previousRecommendations,
     };
-    console.log('Recommendation payload:', payload);
+
     setLastRequestParams(payload); // Save the parameters
-    console.log('Last Request Params:', lastRequestParams);
+
     axios.post('http://localhost:5000/recommend', payload)
       .then(response => {
         setRecommendations(response.data.recommendations);
