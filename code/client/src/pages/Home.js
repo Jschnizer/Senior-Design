@@ -86,7 +86,7 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
       <h2 className="form-section-title">Tune Your Playlist</h2>
 
       {/* Toggle Checkboxes Section */}
-      <div className="checkbox-row">
+      <div className="input-row">
         {Object.keys(enabledInputs).map((key) => (
           <label key={key} className="checkbox-label">
             <input
@@ -106,9 +106,10 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
           <p>Moods</p>
           <MoodRadio selectedMoods={mood} setSelectedMoods={setMood} disabled={!enabledInputs.mood} />
         </div>
-
+        
+        <div className="input-row">
         {/* Discovery */}
-        <label className={!enabledInputs.discovery ? 'disabled' : ''}>
+        <label className={`slider-label ${!enabledInputs.discovery ? 'disabled' : ''}`}>
           Discovery (% New Songs)
           <input
             type="range"
@@ -123,7 +124,7 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
         </label>
 
         {/* Tempo */}
-        <label className={!enabledInputs.tempo ? 'disabled' : ''}>
+        <label className={`slider-label ${!enabledInputs.tempo ? 'disabled' : ''}`}>
           Average Tempo (BPM)
           <input
             type="range"
@@ -135,19 +136,10 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
           />
           <span className="range-value">{tempo} BPM</span>
         </label>
-
-        {/* Use Weather Switch */}
-        <div>
-          <p style={{ marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
-            Use Weather Conditions
-          </p>
-          <WeatherSwitch
-            checked={useWeather}
-            onChange={(e) => setUseWeather(e.target.checked)}
-          />
         </div>
 
         {/* Minimum and Maximum Duration */}
+        <div className="input-row">
         <label className={!enabledInputs.duration ? 'disabled' : ''}>
           Min Duration (Minutes)
           <input
@@ -171,16 +163,30 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
             disabled={!enabledInputs.duration}
           />
         </label>
+        </div>
+
+        {/* Use Weather Switch */}
+        <div className="mood-row">
+        <div>
+          <p style={{ marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
+            Use Weather Conditions
+          </p>
+          <WeatherSwitch
+            checked={useWeather}
+            onChange={(e) => setUseWeather(e.target.checked)}
+          />
+        </div>
 
         {/* Weather Card */}
         {useWeather && weatherData && (
-          <div className="weather-card-row" style={{ gridColumn: '1 / 4', display: 'flex', justifyContent: 'center', margin: '1rem 0' }}>
+          <div className="weather-card-row" style={{ display: 'flex', justifyContent: 'center', margin: '1rem 0' }}>
             <WeatherCard
               weatherData={weatherData}
               iconUrl={`https://openweathermap.org/img/wn/${weatherData.weather[0].icon}@2x.png`}
             />
           </div>
         )}
+        </div>
 
         {/* Genre Selector */}
         <div className={`genres-row ${!enabledInputs.genres ? 'disabled' : ''}`}>

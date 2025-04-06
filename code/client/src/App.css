@@ -200,18 +200,34 @@ footer {
   margin: 0.5rem 0;
 }
 
-.checkbox-row {
+.input-row {
   grid-column: 1 / 4;
   /* spans all columns if you have 3 columns in .inputs-grid */
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.8rem;
   font-family: 'Poppins', sans-serif;
   font-size: 1.2rem;
   color: #fff;
 }
+
+/* Wider sliders */
+.slider-label input[type="range"] {
+  width: 500px; /* or 100%, or any width you want */
+  max-width: 100%;
+}
+
+/* Optional: tighten up slider container spacing */
+.slider-label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
+  min-width: 320px;
+}
+
 
 /* Range slider value display */
 .range-value {
