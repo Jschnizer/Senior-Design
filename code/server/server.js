@@ -13,6 +13,10 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+// Constants for front-end URLs
+const deploymentURL = 'https://senior-design-ten.vercel.app'
+const localURL = 'http://localhost:3000';
+
 // Fetch album cover for a recommendation using Spotify API and validate it
 async function validateAndFetchAlbumCover(rec, accessToken) {
   try {
@@ -134,7 +138,7 @@ app.get('/callback', (req, res) => {
 
       // Redirect to front-end with tokens
       res.redirect(
-        'http://localhost:3000/?' +
+        `${deploymentURL}/?` +
         new URLSearchParams({
           access_token,
           refresh_token,
