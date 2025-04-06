@@ -31,6 +31,10 @@ import { restrictToWindowEdges } from '@dnd-kit/modifiers';
 import axios from 'axios';
 import styled from 'styled-components';
 
+// Constants for API URLs
+const RAILWAY_URL = 'https://senior-design-production.up.railway.app';
+const LOCAL_BACKEND = 'http://localhost:5000';
+
 function SortableTrack({ track, index, isDiscarded, isInPlaylist, onReshuffle }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: track.id
@@ -291,7 +295,7 @@ function Playlist({ token, recommendations, setRecommendations, playlist, setPla
     }
     const trackIds = playlist.map((track) => track.id);
     try {
-      const response = await axios.post('http://localhost:5000/export', {
+      const response = await axios.post(`${RAILWAY_URL}/export`, {
         access_token: token,
         trackIds,
         playlistName: name || "My SoundScape Playlist"

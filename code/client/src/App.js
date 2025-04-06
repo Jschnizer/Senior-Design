@@ -7,6 +7,10 @@ import Playlist from './pages/Playlist';
 import LoginPage from './pages/LoginPage';
 import './App.css';
 
+// Constants for API URLs
+const RAILWAY_URL = 'https://senior-design-production.up.railway.app';
+const LOCAL_BACKEND = 'http://localhost:5000';
+
 function App() {
   // Shared state
   const [playlist, setPlaylist] = useState([]);
@@ -47,7 +51,7 @@ function App() {
           const refreshToken = window.localStorage.getItem('refresh_token');
           if (refreshToken) {
             try {
-              const { data } = await axios.post('http://localhost:5000/refresh', { refresh_token: refreshToken });
+              const { data } = await axios.post(`${RAILWAY_URL}/refresh`, { refresh_token: refreshToken });
               // Save new access token and update state
               window.localStorage.setItem('token', data.access_token);
               setToken(data.access_token);
@@ -97,7 +101,7 @@ function App() {
       return;
     }
     axios
-      .get('http://localhost:5000/me', { params: { access_token: token } })
+      .get(`https://senior-design-production.up.railway.app/me`, { params: { access_token: token } })
       .then((response) => {
         console.log("User Data:", response.data);
         setUserData(response.data);
@@ -117,7 +121,7 @@ function App() {
       (position) => {
         const { latitude, longitude } = position.coords;
         axios
-          .get('http://localhost:5000/weather', {
+          .get(`${RAILWAY_URL}/weather`, {
             params: { lat: latitude, lon: longitude },
           })
           .then((response) => {
@@ -174,7 +178,7 @@ function App() {
 
     setLastRequestParams(payload); // Save the parameters
 
-    axios.post('http://localhost:5000/recommend', payload)
+    axios.post(`${RAILWAY_URL}/recommend`, payload)
       .then(response => {
         setRecommendations(response.data.recommendations);
         localStorage.setItem('recommendations', JSON.stringify(response.data.recommendations));

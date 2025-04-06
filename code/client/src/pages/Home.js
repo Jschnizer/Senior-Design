@@ -9,6 +9,10 @@ import GenreSelector from '../components/GenereSelector';
 import MoodRadio from '../components/MoodRadio';
 import WeatherCard from '../components/WeatherCard';
 
+// Constants for API URLs
+const RAILWAY_URL = 'https://senior-design-production.up.railway.app';
+const LOCAL_BACKEND = 'http://localhost:5000';
+
 function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendations, weatherData, fetchWeather }) {
   const navigate = useNavigate();
 
@@ -36,7 +40,7 @@ function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendati
   // Fetch the user's name when the token is available
   useEffect(() => {
     if (token) {
-      axios.get('http://localhost:5000/user', { params: { access_token: token } })
+      axios.get(`${RAILWAY_URL}/user`, { params: { access_token: token } })
         .then((response) => {
           setUserName(response.data.display_name);
         })
