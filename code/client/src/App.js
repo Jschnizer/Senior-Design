@@ -83,7 +83,7 @@ function App() {
   }, [token]);
 
   const handleLogin = () => {
-    window.location = 'http://localhost:5000/login';
+    window.location = `${RAILWAY_URL}/login`;
   };
 
   const handleLogout = () => {
