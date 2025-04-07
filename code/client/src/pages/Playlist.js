@@ -184,8 +184,7 @@ const ErrorMessageText = styled.p`
   font-family: 'Arial', sans-serif;
 `;
 
-function Playlist({ token, recommendations, setRecommendations, playlist, setPlaylist, loading, fetchRecommendations, lastRequestParams }) {
-  const [discarded, setDiscarded] = useState([]);
+function Playlist({ token, recommendations, setRecommendations, playlist, setPlaylist, discarded, setDiscarded, loading, fetchRecommendations, lastRequestParams }) {
   const [showModal, setShowModal] = useState(false);
   const [playlistName, setPlaylistName] = useState("");
   const [activeId, setActiveId] = useState(null);

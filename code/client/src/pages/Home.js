@@ -13,7 +13,7 @@ import WeatherCard from '../components/WeatherCard';
 const RAILWAY_URL = 'https://senior-design-production.up.railway.app';
 const LOCAL_BACKEND = 'http://localhost:5000';
 
-function Home({ token, playlist, setPlaylist, recommendations, fetchRecommendations, weatherData, fetchWeather }) {
+function Home({ token, playlist, setPlaylist, discarded, setDiscarded, recommendations, fetchRecommendations, weatherData, fetchWeather }) {
   const navigate = useNavigate();
 
   // Local state for contextual inputs

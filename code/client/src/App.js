@@ -14,6 +14,7 @@ const LOCAL_BACKEND = 'http://localhost:5000';
 function App() {
   // Shared state
   const [playlist, setPlaylist] = useState([]);
+  const [discarded, setDiscarded] = useState([]);
   const [token, setToken] = useState('');
   const [userData, setUserData] = useState(null);
   const [weatherData, setWeatherData] = useState(null);
@@ -91,6 +92,7 @@ function App() {
     setUserData(null);
     setRecommendations([]);
     setPlaylist([]);
+    setDiscarded([]);
     window.localStorage.removeItem('token');
     window.localStorage.removeItem('refresh_token');
   };
@@ -221,6 +223,8 @@ function App() {
                 token={token}
                 playlist={playlist}
                 setPlaylist={setPlaylist}
+                discarded={discarded}
+                setDiscarded={setDiscarded}
                 recommendations={recommendations}
                 fetchRecommendations={fetchRecommendations}
                 weatherData={weatherData}
@@ -237,6 +241,8 @@ function App() {
                 setRecommendations={setRecommendations}
                 playlist={playlist}
                 setPlaylist={setPlaylist}
+                discarded={discarded}
+                setDiscarded={setDiscarded}
                 loading={loading}
                 fetchRecommendations={fetchRecommendations}
                 lastRequestParams={lastRequestParams}
