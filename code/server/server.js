@@ -134,6 +134,7 @@ app.get('/callback', (req, res) => {
     .then((response) => {
       const access_token = response.data.access_token;
       const refresh_token = response.data.refresh_token;
+      const expires_in = response.data.expires_in;
       console.log('Access token:', access_token);
 
       // Redirect to front-end with tokens
@@ -142,6 +143,7 @@ app.get('/callback', (req, res) => {
         new URLSearchParams({
           access_token,
           refresh_token,
+          expires_in,
         })
       );
     })
