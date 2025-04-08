@@ -59,7 +59,7 @@ function App() {
           const refreshToken = window.localStorage.getItem('refresh_token');
           if (refreshToken) {
             try {
-              const { data } = await axios.post(`${RAILWAY_URL}/refresh`, { refresh_token: refreshToken });
+              const { data } = await axios.post(`${LOCAL_BACKEND}/refresh`, { refresh_token: refreshToken });
               // Save new access token and update state
               window.localStorage.setItem('token', data.access_token);
               setToken(data.access_token);
@@ -91,7 +91,7 @@ function App() {
   }, [token]);
 
   const handleLogin = () => {
-    window.location = `${RAILWAY_URL}/login`;
+    window.location = `${LOCAL_BACKEND}/login`;
   };
 
   const handleLogout = () => {
@@ -125,7 +125,7 @@ function App() {
       })
       .catch((error) => {
         console.error('Error fetching user data:', error);
-        window.location = `${RAILWAY_URL}/login`;
+        window.location = `${LOCAL_BACKEND}/login`;
         // alert('Failed to fetch user data.');
       });
   };
@@ -139,7 +139,7 @@ function App() {
       (position) => {
         const { latitude, longitude } = position.coords;
         axios
-          .get(`${RAILWAY_URL}/weather`, {
+          .get(`${LOCAL_BACKEND}/weather`, {
             params: { lat: latitude, lon: longitude },
           })
           .then((response) => {
@@ -158,7 +158,7 @@ function App() {
     );
   };
 
-  const fetchRecommendations = (mood, percentNew, genres, tempo, minDuration, maxDuration, useWeather, selectedArtists, clearPrev) => {
+  const fetchRecommendations = (mood, percentNew, genres, tempo, minDuration, maxDuration, useWeather, selectedArtists, clearPrev, specialInstructions) => {
     if (!token) {
       alert('Please log in first!');
       return;
@@ -192,11 +192,12 @@ function App() {
       access_token: token,
       selectedArtists,
       previousRecommendations,
+      specialInstructions,
     };
 
     setLastRequestParams(payload); // Save the parameters
 
-    axios.post(`${RAILWAY_URL}/recommend`, payload)
+    axios.post(`${LOCAL_BACKEND}/recommend`, payload)
       .then(response => {
         setRecommendations(response.data.recommendations);
         localStorage.setItem('recommendations', JSON.stringify(response.data.recommendations));

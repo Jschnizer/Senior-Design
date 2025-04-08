@@ -139,7 +139,7 @@ app.get('/callback', (req, res) => {
 
       // Redirect to front-end with tokens
       res.redirect(
-        `${deploymentURL}/?` +
+        `${localURL}/?` +
         new URLSearchParams({
           access_token,
           refresh_token,
@@ -206,6 +206,7 @@ app.post('/recommend', async (req, res) => {
       access_token,      // Spotify access token for retrieving album covers
       selectedArtists,   // array of selected artist names
       previousRecommendations, // array of previously recommended track IDs
+      specialInstructions, // any special instructions from the user
     } = req.body;
     // console.log("Received recommendation request:", req.body);
 
@@ -242,6 +243,7 @@ Context:
 - Duration Range: ${minDuration} to ${maxDuration} minutes
 - Preferred Genres: ${genres && genres.length ? genres.join(", ") : "any"}
 - Selected Artists: ${selectedArtistNames && selectedArtistNames.length ? selectedArtistNames.join(", ") : "any"}
+- Special Instructions: ${specialInstructions || "none"}
 
 For each recommended track, please provide:
 - Spotify track ID (if available; if not, leave as null)

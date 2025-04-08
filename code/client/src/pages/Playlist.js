@@ -294,7 +294,7 @@ function Playlist({ token, recommendations, setRecommendations, playlist, setPla
     }
     const trackIds = playlist.map((track) => track.id);
     try {
-      const response = await axios.post(`${RAILWAY_URL}/export`, {
+      const response = await axios.post(`${LOCAL_BACKEND}/export`, {
         access_token: token,
         trackIds,
         playlistName: name || "My SoundScape Playlist"
@@ -374,7 +374,8 @@ function Playlist({ token, recommendations, setRecommendations, playlist, setPla
         lastRequestParams.maxDuration,
         lastRequestParams.useWeather,
         lastRequestParams.selectedArtists,
-        false // Don't clear previous recommendations
+        false, // Don't clear previous recommendations
+        lastRequestParams.specialInstructions
       );
     }
   };

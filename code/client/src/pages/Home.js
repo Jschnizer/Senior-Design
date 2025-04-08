@@ -8,6 +8,7 @@ import TopArtistsSelector from '../components/TopArtistsSelector';
 import GenreSelector from '../components/GenereSelector';
 import MoodRadio from '../components/MoodRadio';
 import WeatherCard from '../components/WeatherCard';
+import SpecialInstructionsInput from '../components/SpecialInstructionsInput';
 
 // Constants for API URLs
 const RAILWAY_URL = 'https://senior-design-production.up.railway.app';
@@ -26,6 +27,7 @@ function Home({ token, playlist, setPlaylist, discarded, setDiscarded, recommend
   const [maxDuration, setMaxDuration] = useState(30);
   const [selectedArtists, setSelectedArtists] = useState([]);
   const [userName, setUserName] = useState('');
+  const [specialInstructions, setSpecialInstructions] = useState('');
 
   // State for checkboxes to enable/disable inputs
   const [enabledInputs, setEnabledInputs] = useState({
@@ -40,7 +42,7 @@ function Home({ token, playlist, setPlaylist, discarded, setDiscarded, recommend
   // Fetch the user's name when the token is available
   useEffect(() => {
     if (token) {
-      axios.get(`${RAILWAY_URL}/user`, { params: { access_token: token } })
+      axios.get(`${LOCAL_BACKEND}/user`, { params: { access_token: token } })
         .then((response) => {
           setUserName(response.data.display_name);
         })
@@ -74,7 +76,8 @@ function Home({ token, playlist, setPlaylist, discarded, setDiscarded, recommend
       enabledInputs.duration ? maxDuration : null,
       useWeather,
       enabledInputs.artists ? selectedArtists : null,
-      true // clear previous recommendations
+      true, // clear previous recommendations
+      specialInstructions
     );
     navigate('/playlist');
   };
@@ -198,6 +201,15 @@ function Home({ token, playlist, setPlaylist, discarded, setDiscarded, recommend
         <div className={`top-artists-row ${!enabledInputs.artists ? 'disabled' : ''}`}>
           <h3>Select From Your Top Artists</h3>
           <TopArtistsSelector token={token} selectedArtists={selectedArtists} setSelectedArtists={setSelectedArtists} disabled={!enabledInputs.artists} />
+        </div>
+
+        {/* Special Instructions Input */}
+        <div className="instructions-row" style={{ gridColumn: '1 / 4', textAlign: 'center', marginTop: '1rem' }}>
+          <p style={{ fontFamily: 'Poppins', fontSize: '1.2rem'}}>Special Instructions</p>
+          <SpecialInstructionsInput
+            value={specialInstructions}
+            onChange={(e) => setSpecialInstructions(e.target.value)}
+          />
         </div>
       </div>
 
