@@ -42,7 +42,7 @@ function Home({ token, playlist, setPlaylist, discarded, setDiscarded, recommend
   // Fetch the user's name when the token is available
   useEffect(() => {
     if (token) {
-      axios.get(`${LOCAL_BACKEND}/user`, { params: { access_token: token } })
+      axios.get(`${RAILWAY_URL}/user`, { params: { access_token: token } })
         .then((response) => {
           setUserName(response.data.display_name);
         })

@@ -139,7 +139,7 @@ app.get('/callback', (req, res) => {
 
       // Redirect to front-end with tokens
       res.redirect(
-        `${localURL}/?` +
+        `${deploymentURL}/?` +
         new URLSearchParams({
           access_token,
           refresh_token,

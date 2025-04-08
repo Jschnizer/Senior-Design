@@ -294,7 +294,7 @@ function Playlist({ token, recommendations, setRecommendations, playlist, setPla
     }
     const trackIds = playlist.map((track) => track.id);
     try {
-      const response = await axios.post(`${LOCAL_BACKEND}/export`, {
+      const response = await axios.post(`${RAILWAY_URL}/export`, {
         access_token: token,
         trackIds,
         playlistName: name || "My SoundScape Playlist"

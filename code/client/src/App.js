@@ -59,7 +59,7 @@ function App() {
           const refreshToken = window.localStorage.getItem('refresh_token');
           if (refreshToken) {
             try {
-              const { data } = await axios.post(`${LOCAL_BACKEND}/refresh`, { refresh_token: refreshToken });
+              const { data } = await axios.post(`${RAILWAY_URL}/refresh`, { refresh_token: refreshToken });
               // Save new access token and update state
               window.localStorage.setItem('token', data.access_token);
               setToken(data.access_token);
@@ -91,7 +91,7 @@ function App() {
   }, [token]);
 
   const handleLogin = () => {
-    window.location = `${LOCAL_BACKEND}/login`;
+    window.location = `${RAILWAY_URL}/login`;
   };
 
   const handleLogout = () => {
@@ -125,7 +125,7 @@ function App() {
       })
       .catch((error) => {
         console.error('Error fetching user data:', error);
-        window.location = `${LOCAL_BACKEND}/login`;
+        window.location = `${RAILWAY_URL}/login`;
         // alert('Failed to fetch user data.');
       });
   };
@@ -139,7 +139,7 @@ function App() {
       (position) => {
         const { latitude, longitude } = position.coords;
         axios
-          .get(`${LOCAL_BACKEND}/weather`, {
+          .get(`${RAILWAY_URL}/weather`, {
             params: { lat: latitude, lon: longitude },
           })
           .then((response) => {
@@ -197,7 +197,7 @@ function App() {
 
     setLastRequestParams(payload); // Save the parameters
 
-    axios.post(`${LOCAL_BACKEND}/recommend`, payload)
+    axios.post(`${RAILWAY_URL}/recommend`, payload)
       .then(response => {
         setRecommendations(response.data.recommendations);
         localStorage.setItem('recommendations', JSON.stringify(response.data.recommendations));
