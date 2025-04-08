@@ -363,6 +363,7 @@ function Playlist({ token, recommendations, setRecommendations, playlist, setPla
   // Handler for requesting more recommendations using the same parameters
   const handleGetMoreRecommendations = () => {
     console.log("Requesting more recommendations...");
+    let discardedRecommenations = discarded.map((track) => track.id);
     if (fetchRecommendations && lastRequestParams) {
       console.log("Fetching more recommendations with the same parameters...");
       fetchRecommendations(
@@ -375,7 +376,8 @@ function Playlist({ token, recommendations, setRecommendations, playlist, setPla
         lastRequestParams.useWeather,
         lastRequestParams.selectedArtists,
         false, // Don't clear previous recommendations
-        lastRequestParams.specialInstructions
+        lastRequestParams.specialInstructions,
+        discardedRecommenations
       );
     }
   };

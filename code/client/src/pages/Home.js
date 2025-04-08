@@ -77,7 +77,8 @@ function Home({ token, playlist, setPlaylist, discarded, setDiscarded, recommend
       useWeather,
       enabledInputs.artists ? selectedArtists : null,
       true, // clear previous recommendations
-      specialInstructions
+      specialInstructions,
+      null // no discarded recommendations
     );
     navigate('/playlist');
   };

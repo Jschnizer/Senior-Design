@@ -158,7 +158,7 @@ function App() {
     );
   };
 
-  const fetchRecommendations = (mood, percentNew, genres, tempo, minDuration, maxDuration, useWeather, selectedArtists, clearPrev, specialInstructions) => {
+  const fetchRecommendations = (mood, percentNew, genres, tempo, minDuration, maxDuration, useWeather, selectedArtists, clearPrev, specialInstructions, discardedRecommenations) => {
     if (!token) {
       alert('Please log in first!');
       return;
@@ -193,6 +193,7 @@ function App() {
       selectedArtists,
       previousRecommendations,
       specialInstructions,
+      discardedRecommenations,
     };
 
     setLastRequestParams(payload); // Save the parameters

@@ -207,6 +207,7 @@ app.post('/recommend', async (req, res) => {
       selectedArtists,   // array of selected artist names
       previousRecommendations, // array of previously recommended track IDs
       specialInstructions, // any special instructions from the user
+      discardedRecommenations, // array of previously discarded track IDs
     } = req.body;
     // console.log("Received recommendation request:", req.body);
 
@@ -233,6 +234,7 @@ You are a music recommendation assistant. Based on the contextual information an
 ${historyText}
 
 Here is a list of previously recommended tracks (IDs only). Do not recommend any of these tracks: ${previousRecommendations && previousRecommendations.length ? previousRecommendations.join(", ") : "none"}.
+Here is a list of previously discarded tracks (IDs only). Please adjust your recommendations accordingly: ${discardedRecommenations && discardedRecommenations.length ? discardedRecommenations.join(", ") : "none"}.
 
 Context:
 - Mood: ${mood}
