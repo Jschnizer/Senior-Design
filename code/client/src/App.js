@@ -27,20 +27,27 @@ function App() {
     const hash = window.location.search;
     let savedToken = window.localStorage.getItem('token');
     let savedRefreshToken = window.localStorage.getItem('refresh_token');
+    let savedExpiration = window.localStorage.getItem('token_expiration');
 
     if (!savedToken && hash) {
       const urlParams = new URLSearchParams(hash.substring(1));
       savedToken = urlParams.get('access_token');
       const newRefreshToken = urlParams.get('refresh_token');
+      const expiresIn = urlParams.get('expires_in');
+
       window.location.search = '';
       window.localStorage.setItem('token', savedToken);
       if (newRefreshToken) {
         window.localStorage.setItem('refresh_token', newRefreshToken);
         savedRefreshToken = newRefreshToken;
       }
+      if (expiresIn) {
+        // Convert seconds to a timestamp in ms
+        const expirationTime = Date.now() + expiresIn * 1000;
+        window.localStorage.setItem('token_expiration', expirationTime);
+      }
     }
     setToken(savedToken);
-    // fetchWeather();
   }, []);
 
   // Axios interceptor for refreshing token on 401
@@ -102,6 +109,14 @@ function App() {
       alert('Please log in first!');
       return;
     }
+
+    // Check if the token is expired and handle logout if it is
+    const expirationTime = window.localStorage.getItem('token_expiration');
+    if (Date.now() > expirationTime) {
+      handleLogout();
+      return;
+    }
+
     axios
       .get(`https://senior-design-production.up.railway.app/me`, { params: { access_token: token } })
       .then((response) => {
@@ -110,7 +125,8 @@ function App() {
       })
       .catch((error) => {
         console.error('Error fetching user data:', error);
-        alert('Failed to fetch user data.');
+        window.location = `${RAILWAY_URL}/login`;
+        // alert('Failed to fetch user data.');
       });
   };
 
