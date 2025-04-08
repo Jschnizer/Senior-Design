@@ -237,25 +237,42 @@ function Playlist({ token, recommendations, setRecommendations, playlist, setPla
       return;
     }
 
-    // Get the viewport width
-    const viewportWidth = window.innerWidth;
+    // Get the drop zone elements
+    const discardList = document.querySelector('.discard-list');
+    const playlistList = document.querySelector('.playlist-list');
 
-    // Get the final position of the dragged item
-    const finalPosition = active.rect.current.translated?.left || 0;
+    if (!discardList || !playlistList) {
+      setActiveId(null);
+      return;
+    }
 
-    // Calculate the drop zones
-    const leftThreshold = viewportWidth * 0.25;
-    const rightThreshold = viewportWidth * 0.75;
+    // Get dimensions of the drop zones
+    const discardRect = discardList.getBoundingClientRect();
+    const playlistRect = playlistList.getBoundingClientRect();
 
-    // Check where the item was dropped
-    if (finalPosition < leftThreshold) {
-      // Left 25% - discard
+    // Get the dragged item's dimensions and position
+    const draggedItemRect = active.rect.current;
+    const draggedItemWidth = draggedItemRect?.width || 0;
+    const draggedItemLeft = draggedItemRect?.translated?.left || 0;
+    const draggedItemRight = draggedItemRect?.translated?.right || 0;
+
+
+    // Calculate midpoint of the dragged item
+    const finalPosition = draggedItemLeft + (draggedItemWidth / 2);
+
+    // Calculate thresholds based on drop zone edges
+    const leftThreshold = discardRect.right; // Right edge of discard list
+    const rightThreshold = playlistRect.left; // Left edge of playlist list
+
+    // Check where the item's midpoint was dropped
+    if (draggedItemLeft < leftThreshold) {
+      // Midpoint left of discard list right edge - discard
       handleDiscard(activeTrack);
-    } else if (finalPosition > rightThreshold) {
-      // Right 25% - add to playlist
+    } else if (draggedItemRight > rightThreshold) {
+      // Midpoint right of playlist list left edge - add to playlist
       handleAddToPlaylist(activeTrack);
     } else if (over && ['discard-dropzone', 'playlist-dropzone'].includes(over.id)) {
-      // If dropped on explicit drop zones
+      // If dropped directly on drop zones
       if (over.id === 'playlist-dropzone') {
         handleAddToPlaylist(activeTrack);
       } else if (over.id === 'discard-dropzone') {
@@ -359,7 +376,7 @@ function Playlist({ token, recommendations, setRecommendations, playlist, setPla
       </div>
     );
   }
-  
+
   // Handler for requesting more recommendations using the same parameters
   const handleGetMoreRecommendations = () => {
     console.log("Requesting more recommendations...");
@@ -423,21 +440,34 @@ function Playlist({ token, recommendations, setRecommendations, playlist, setPla
             <h2>Swipe Songs</h2>
             {recommendations.length > 0 ? (
               <div className="swipe-card-wrapper">
-                <SwipeableCard track={recommendations[0]} />
+                <SwipeableCard
+                  track={recommendations[0]}
+                  style={{
+                    opacity: activeId === recommendations[0]?.id ? 0 : 1,
+                    transition: 'opacity 0.2s ease',
+                    pointerEvents: activeId ? 'none' : 'auto'
+                  }}
+                />
                 <div className="button-group">
                   <MinusButton onClick={() => handleDiscard(recommendations[0])} />
                   <PlusButton onClick={() => handleAddToPlaylist(recommendations[0])} />
                 </div>
-                {/* Instead of absolutely positioning, we let the button be in the flow */}
-                <div style={{ marginTop: '1rem', textAlign: 'center' }}>
-                  <GenerateButton onClick={handleGetMoreRecommendations} text="Get More Recommendations" />
+                <div style={{ marginTop: '700px' }}>
+                  <ExportButton onClick={() => setShowModal(true)} />
                 </div>
+
               </div>
             ) : (
-              <div style={{ marginTop: '2rem', textAlign: 'center' }}>
-                <ExportButton onClick={() => setShowModal(true)} />
-                <div style={{ marginTop: '1rem' }}>
+              <div style={{ marginTop: '2rem', textAlign: 'center', content: 'center', justifyContent: 'center' }}>
+                <div style={{
+                  marginTop: '2rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center', // This centers horizontally
+                  gap: '1rem' // Adds consistent spacing between buttons
+                }}>
                   <GenerateButton onClick={handleGetMoreRecommendations} text="Get More Recommendations" />
+                  <ExportButton onClick={() => setShowModal(true)} />
                 </div>
               </div>
             )}
