@@ -9,17 +9,18 @@ Team Members:
   3. Derrick Mchale (mchaleds@mail.uc.edu) - Computer Science
 
 # Table of Contents
-1. Team Names and Abstract: [Assignment 2 - Project Description](assignments/Fall/Assignment%202%20-%20Project%20Description/project-description.md)
-3. Project Description: [Assignment 2 - Project Description](assignments/Fall/Assignment%202%20-%20Project%20Description/project-description.md)
-4. User Stories and Diagrams: [Assignment 4 - Design Diagrams and User Stories](assignments/Fall/Assignment%204%20-%20Design%20Diagrams%20and%20User%20Stories)
-5. Project Tasks and Timeline: [Assignment 5 Task Lists](assignments/Fall/Assignment%205%20-%20Task%20Lists/Tasklist.md) and [Assignment 6 - Milestones, Timeline, and Effort Matrix](/assignments/Fall/Assignment%206%20-%20Milestones,%20Timeline,%20and%20Effort%20Matrix/Milestones,%20Timeline%20and%20Effort%20Matrix.pdf)
-6. ABET Concerns Essay: [Assignment 7 - Project Constraints Essay](assignments/Fall/Assignment%207%20-%20Project%20Constraints%20Essay/Constraint%20Essay.pdf)
-7. Project Presentation Slideshow/Video: [Assignment 8 - Fall Design Slideshow/Video](assignments/Fall/Assignment%208%20-%20Fall%20Design%20Slideshow%20and%20Video)
-8. Self-Asessment Essays: [Assignment 3 - Self-Assessment Essays](assignments/Fall/Assignment%203%20-%20Self-Assessment%20Essays)
-9. Professional Biographies: [Assignment 1 - Professional Biographies](assignments/Fall/Assignment%201%20-%20Professional%20Biographies)
-10. Budget: [Budget](Budget.md)
-11. Appendix:
+1. Project Description: [Project Description](assignments/Fall/Assignment%202%20-%20Project%20Description/project-description.md)
+2. User Interface Specification: 
+3. Test Plan/Results: [Test Plan](assignments/Spring/Assignment%201%20-Test%20Plan/SoundScape%20Test%20Plan.pdf)
+4. User Manual: [User Manual](code/User%20Documentation.md)
+5. Final Presentation: [Final Presentation](assignments/Spring/Assignment%203%20-%20Presentation%20Slidedeck/SoundScape%20Presentation.pdf)
+6. Expo Poster: [Poster](assignments/Spring/Assignment%204%20-%20Poster/SoundScape%20Poster.pdf)
+7. Assessments:
+    - [Initial Self Assessments](assignments/Fall/Assignment%203%20-%20Self-Assessment%20Essays)
+    - [Final Self Assessments](assignments/Spring/Assignment%206%20-%20Self%20Assessments)
+8. Summary of Hours and Justification: [Hours Spreadsheet](assignments/Appendix%20Materials/SoundScape%20Hours%20Tracking.xlsx)
+9. Summary of Expenses: [Budget](Budget.md) 
+10. Appendix:
     - [Code](code/)
     - [Meeting Notes](assignments/Appendix%20Materials/SoundScape%20Project%20Meeting%20Notes.pdf)
     - [References](assignments/Appendix%20Materials/References.md)
-    - [Hours Tracking Sheet](assignments/Appendix%20Materials/SoundScape%20Hours%20Tracking.xlsx)
