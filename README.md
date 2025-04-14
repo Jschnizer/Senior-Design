@@ -10,7 +10,7 @@ Team Members:
 
 # Table of Contents
 1. Project Description: [Project Description](assignments/Fall/Assignment%202%20-%20Project%20Description/project-description.md)
-2. User Interface Specification: 
+2. UI Specification and Demo Video: [UI Specification and Demo Video](assignments/Appendix%20Materials/Demo%20and%20UI)
 3. Test Plan/Results: [Test Plan](assignments/Spring/Assignment%201%20-Test%20Plan/SoundScape%20Test%20Plan.pdf)
 4. User Manual: [User Manual](code/User%20Documentation.md)
 5. Final Presentation: [Final Presentation](assignments/Spring/Assignment%203%20-%20Presentation%20Slidedeck/SoundScape%20Presentation.pdf)
