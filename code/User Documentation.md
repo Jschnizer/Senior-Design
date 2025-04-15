@@ -21,38 +21,46 @@
 # Application Running
 1. When you run *npm start*, it will launch the application. Otherwise, by default, it will run on port 3000 (while it is still in development) so you can navigate to [localhost:3000](http://localhost:3000) to access the app
 2. Log into the application with the credentials associated with the email that was entered in the spotify developer console
-3. Upon logging in, select various contextual inputs for song filtering *Note this functionality is currently not working and in development.
-4. Select "Get My Tracks" at the top of the page, and a swipable card field will appear populated with song recommendations based on spotify listening data. Swipe this card to begin adding songs to a playlist. *Note this functionality is currently not working and in development. Songs may be swiped and are added to a list to simulate playlist building currently.
+3. Upon logging in, you will be brought to the home page of the application. Here you may enter any contextual inputs or criteria you are interested in for song generation.
+4. Once the criteria is entered, click 'Generate Playlist' at the bottom of the page to begin.
 
 # SoundScape Home Page
 1. Top Bar Buttons for Navigation and Testing
-    1. Home Button - use this button to navigate to the home page from any other page on the site
-    2. Playlist Button - use this button to navigate to the playlist generation page at any time *Note this is for testing purposes only, this button will likely be removed in future versions of the application.
-    3. Login/Logout Button - use this button to login or logout of the application whenever necessary. The button will change based on whether the application is logged in or logged out.
-    4. Get Weather Button - use this button to retrieve information about the current weather in your location. *Note this button is for testing purposes currently and will likely be removed in future versions of the application.
+    1. Home Button - use this button to navigate to the home page from any other page on the site.
+    2. Playlist Button - use this button to navigate to the playlist generation page at any time.
+    3. Login/Logout Button - use this button to login or logout of the application whenever necessary.
+    4. Generate Playlist Button - use this button to begin the generation process using the currently selected criteria and prompts.
 2. Page Fields for Filtering Songs
-    1. Mood - use this dropdown to select your current mood for playlist generation
-    2. Genres - use this dropdown to select genres to include in the playlist 
-    3. Minimum Song Duration - use this to enter the lower bound for song duration filtering
-    4. Maximum Song Duration - use this to enter the upper bound for song duration filtering
-    5. Discovery % - use this slider to select the amount of songs to generate that are new to you
-    6. Tempo (BPM) - use this slider to select upper and lower bounds for filtering on BPM of songs
-    7. Weather Conditions - use this checkbox to toggle the use of weather conditions in playlist generation
-    8. Generate Playlist - use this button to begin the song generation process once all desired filters are entered
+    1. Top Checkboxes - use these ceckboxes to enable or disable contextual inputs. When deselected, a contextual input will not be used in the generation process.
+    2. Mood - use this checkbox selection to choose your current mood(s) for playlist generation
+    3. Genres - use this checkbox selection to choose genres to include in the playlist 
+    4. Minimum Song Duration - use this to enter the lower bound for song duration filtering
+    5. Maximum Song Duration - use this to enter the upper bound for song duration filtering
+    6. Discovery % - use this slider to select the amount of songs to generate that are new to you based on Spotify listening habits
+    7. Tempo (BPM) - use this slider to select upper and lower bounds for filtering on BPM of songs
+    8. Weather Conditions - use this toggle to enable the use of weather conditions in playlist generation
+    9. Top Artists - use this selection field to choose from your current top artists to include them in the playlist generation
+    10. Special Instructions - use this text input to write any special instructions for the AI model to take into account when generating recommendations
+    11. Generate Playlist - use this button to begin the song generation process once all desired filters are entered
 
-![Home Page Image](/code/User-Docs-Images/HomePage.PNG "Home Page Image")
+![Home Page Image 1](./User-Docs-Images/HomePage1.PNG "Home Page Image 1")
+![Home Page Image 2](./User-Docs-Images/HomePage2.PNG "Home Page Image 2")
 
 # SoundScape Playlist Page
-1. Swipe Box - Recommended songs will appear in the swipe box in the middle of the page. Click and drag the song image to the right to add it to the current playlist.
-2. Song List - The current list of selected songs will appear above the playlist as they are swiped from the swipe box.
-3. *Note there is currently no way to export songs to Spotify yet, this will be added in a future version.
+1. Swipe Box - Recommended songs will appear in the swipe box in the middle of the page. Click and drag the song image to the right to add it to the current playlist. Click and drag the song to the left to add the song to the discard list.
+2. Playlist - The current list of selected songs will appear in the 'Playlist' section as they are swiped from the center swipe box. Songs in the 'Playlist' section can be re-arranged using the drag handles, or reshuffled to the center using the reshuffle button.
+3. Discarded Songs - The current list of discarded songs will appear in the 'Discarded Songs' section as they are swiped from the center swipe box. Songs in the 'Discarded Songs' section can be re-arranged using the drag handles, or reshuffled to the center using the reshuffle button.
+4. Plus / Minus Buttons - The plus and minus buttons can be used to achieve the same result as swiping the songs left or right with the cursor. Plus will add the song to the Playlist, and Minus will add the song to the discard list.
+5. Export Playlist - The export playlist button will display a pop up box prompting the user to enter a name for their playlist and a back button option, or a submit button option. On submission, the user will recieve a message confirming that the playlist has been successfully exported to their Spotify account.
+6. Get More Recommendations - When the user has exhausted their recommendations, the Get More Recommendations button will appear. This button allows the user to generate a new round of recommendations and continue adding them to their playlist.
 
-![Playlist Page Image](/code/User-Docs-Images/PlaylistPage.PNG "Playlist Page Image") 
+![Playlist Page Image 1](./User-Docs-Images/PlaylistPage1.PNG "Playlist Page Image 1") 
+![Playlist Page Image 2](./User-Docs-Images/PlaylistPage2.PNG "Playlist Page Image 2") 
 
 # FAQ
 1. How do I link my Spotify account so I get accurate recommendations? - Login to the app with your spotify credentials and the recommendations will be specific to your listening history.
 2. What if I don't want to utilize all filter fields on the home page? - Many of these filter fields will be toggleable so that the user can decide whether or not they want certain fields to be used in playlist generation.
-3. What if I want to reshuffle a song back into recommendations if I'm not sure I want it yet? - A reshuffle feature will be added in a future version of the app, this will allow users to save a song for later if they aren't sure yet.
+3. What if I want to reshuffle a song back into recommendations if I'm not sure I want it yet? - Use the reshuffle button on the song tiles in the playlist and discard lists.
 
 
 
