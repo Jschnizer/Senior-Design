@@ -1,4 +1,8 @@
-**Note that this application is currently in development, and the steps to run the application and use the application may change frequently as the app is in development. These docs will continue to be updated as the application is developed*
+# Publicly Available Site
+SoundScape is available for anyone to use. If you would like to use the app and are not worried about the process of running the code, please visit the publicly available site at [this link](https://senior-design-soundscape.vercel.app/) and log in with your Spotify account
+   - *IMPORTANT: To have access to SoundScape, you must contact one of the developers (see [project description](../assignments/Fall/Assignment%202%20-%20Project%20Description/project-description.md) for contact information) to have the email associated with your Spotify account added to the list of approved users*
+
+*NOTE: The following steps outline how to run the code in a development environment. If you are simply interested in using SoundScape, please visit the publicly available site at [this link](https://senior-design-soundscape.vercel.app/). Further instructions on how to use the app can be found below*
 
 # Steps Before Launch
 1. Install all dependencies
@@ -14,15 +18,14 @@
 3. Open another terminal and navigate to code/client
 4. Run *npm start*
 
-## To run the python server to access the AI model:
-1. Navigate to model/server
-2. Run *python server.py*
-
 # Application Running
-1. When you run *npm start*, it will launch the application. Otherwise, by default, it will run on port 3000 (while it is still in development) so you can navigate to [localhost:3000](http://localhost:3000) to access the app
+1. When you run *npm start*, it will launch the application. Otherwise, by default, it will run on port 3000 so you can navigate to [localhost:3000](http://localhost:3000) to access the app
 2. Log into the application with the credentials associated with the email that was entered in the spotify developer console
 3. Upon logging in, you will be brought to the home page of the application. Here you may enter any contextual inputs or criteria you are interested in for song generation.
 4. Once the criteria is entered, click 'Generate Playlist' at the bottom of the page to begin.
+
+---
+*The following sections outline how to use the SoundScape app*
 
 # SoundScape Home Page
 1. Top Bar Buttons for Navigation and Testing
